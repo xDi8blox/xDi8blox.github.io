@@ -306,15 +306,17 @@ export function initScene(canvas, opts = {}) {
     group.rotation.y = travelRot + scrollY_ * .0011 + mx * .35;
     group.rotation.x = .25 + scrollY_ * .0004 - my * .2;
     group.rotation.z = -.12;
+    const pulse = (typeof window !== 'undefined' && window.__diabloAmp) ? window.__diabloAmp() : 0;
+    const heatMul = 1 + pulse * .18;
     const mRad = Math.max(0, cur.msize) * halfH * .5;     // mark height = msize * viewport height
     markGroup.visible = mRad > .002;
     if (markGroup.visible) {
       markGroup.scale.setScalar(mRad * 2);
       markGroup.position.set(cur.msx * halfW + mx * .05, cur.msy * halfH + my * .03, 0);
       markGroup.rotation.set(Math.max(-.1, Math.min(.1, -my * .1)) + .03, Math.max(-.22, Math.min(.22, Math.sin(time * .35) * .13 + mx * .16)), 0);
-      muni.uHeat.value = cur.mheat * intro;
+      muni.uHeat.value = cur.mheat * intro * heatMul;
     }
-    uni.uHeat.value = cur.heat * intro;
+    uni.uHeat.value = cur.heat * intro * heatMul;
     uni.uBump.value = .22 * cur.bump;
     duni.uAmt.value = (.5 + cur.heat * .5) * intro;
     renderer.render(scene, camera);

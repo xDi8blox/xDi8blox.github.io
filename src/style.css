@@ -62,8 +62,28 @@ nav .wrap{display:flex;align-items:center;height:100%;gap:48px}
 .brand .display{font-size:20px;font-weight:800;letter-spacing:.14em;margin-top:1px}
 .mk{height:24px;width:18.2px;color:var(--fg);flex:none;fill:currentColor;transition:transform .7s var(--ease)}
 .brand:hover .mk{transform:translateY(-2px) rotate(8deg)}
-.foot-l{display:inline-flex;align-items:center;gap:12px}
+.foot-l{display:flex;flex-direction:column;align-items:flex-start;gap:7px}
+.foot-brand{display:inline-flex;align-items:center;gap:12px}
 .foot-l .mk{height:16px;width:12.2px;color:var(--mut)}
+.foot-credit{font-size:10.5px;color:var(--dim);letter-spacing:.02em;line-height:1.3}
+.foot-credit a{color:inherit;border-bottom:1px solid transparent;transition:color .25s,border-color .25s}
+.foot-credit a:hover{color:var(--mut);border-bottom-color:var(--line2)}
+.snd{display:inline-flex;align-items:center;gap:8px;margin:0;padding:4px 0;border:0;background:none;color:var(--mut);cursor:pointer;line-height:1;flex:none}
+.snd:hover,.snd.on{color:var(--fg)}
+.snd-lab{font-size:11px;letter-spacing:.16em;text-transform:uppercase;margin-top:1px}
+.eq{display:inline-flex;align-items:flex-end;gap:2.5px;height:11px;width:13px}
+.eq i{display:block;width:1.5px;background:currentColor;height:100%;transform:scaleY(.35);transform-origin:center bottom}
+.eq i:nth-child(1){transform:scaleY(.4)}
+.eq i:nth-child(2){transform:scaleY(.7)}
+.eq i:nth-child(3){transform:scaleY(.5)}
+.eq i:nth-child(4){transform:scaleY(.85)}
+.snd.on .eq i{animation:eqb 1.05s ease-in-out infinite}
+.snd.on .eq i:nth-child(1){animation-duration:1.05s}
+.snd.on .eq i:nth-child(2){animation-duration:.82s;animation-delay:-.2s}
+.snd.on .eq i:nth-child(3){animation-duration:1.18s;animation-delay:-.45s}
+.snd.on .eq i:nth-child(4){animation-duration:.9s;animation-delay:-.1s}
+@keyframes eqb{0%,100%{transform:scaleY(.28)}40%{transform:scaleY(1)}70%{transform:scaleY(.45)}}
+@media (prefers-reduced-motion:reduce){.snd.on .eq i{animation:none}}
 .links{display:flex;gap:30px;color:var(--mut);font-size:14px}
 .links a{position:relative;padding:4px 0;transition:color .25s}
 .links a::after,.ul::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform .45s var(--ease)}
@@ -266,7 +286,7 @@ footer .wrap{min-height:68px;display:flex;align-items:center;justify-content:spa
 }
 @media (max-width:760px){
  .wrap{padding:0 20px}
- .links,.nav-mail{display:none}.menu-btn{display:block}
+ .links,.nav-mail{display:none}.menu-btn{display:block}.navr{gap:12px}.snd-lab{font-size:10px;letter-spacing:.14em}
  nav{height:62px}
  .brand .display{font-size:17px}.brand{gap:9px}.mk{height:21px;width:16px}
  /* portrait hero: form up top, stacked wordmark at the foot, copy between */

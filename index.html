@@ -58,6 +58,10 @@
       <a href="#contact" data-link>Contact</a>
     </div>
     <div class="navr">
+      <button class="snd" id="sndBtn" type="button" aria-pressed="false" aria-label="Sound, off">
+        <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span class="snd-lab mono">Sound</span>
+      </button>
       <a class="nav-mail mono" href="mailto:Humanoid118@gmail.com">Humanoid118@gmail.com<svg><use href="#arr"/></svg></a>
       <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false"><i></i><i></i></button>
     </div>
@@ -290,9 +294,13 @@
 </main>
 
 <footer>
-  <div class="wrap mono"><span class="foot-l"><svg class="mk" aria-hidden="true"><use href="#mark"/></svg>© 2026 Diablo</span><span class="foot-r"><a class="ul" href="mailto:Humanoid118@gmail.com">Email</a><a class="gh-ico" href="https://github.com/xDi8blox" target="_blank" rel="noopener" aria-label="GitHub"><svg><use href="#gh"/></svg></a><a class="ul" href="#hero">Top</a></span></div>
+  <div class="wrap mono"><span class="foot-l"><span class="foot-brand"><svg class="mk" aria-hidden="true"><use href="#mark"/></svg>© 2026 Diablo</span><span class="foot-credit">Music by <a href="https://freemusicarchive.org/music/Soularflair/cc-by-free-to-use-for-anything-1/still-post-rock-dark-moody-instrumental/" target="_blank" rel="noopener">Soularflair (Still)</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a></span></span><span class="foot-r"><a class="ul" href="mailto:Humanoid118@gmail.com">Email</a><a class="gh-ico" href="https://github.com/xDi8blox" target="_blank" rel="noopener" aria-label="GitHub"><svg><use href="#gh"/></svg></a><a class="ul" href="#hero">Top</a></span></div>
 </footer>
 
+<audio id="bgm" loop preload="metadata" playsinline>
+  <source src="/audio/still.m4a" type="audio/mp4">
+  <source src="/audio/still.mp3" type="audio/mpeg">
+</audio>
 <script type="module" src="/src/main.js"></script>
 <noscript><style>.loader{display:none!important}[data-reveal],.ch,[data-hero],.tl{opacity:1!important;transform:none!important}</style></noscript>
 </body>

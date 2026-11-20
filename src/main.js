@@ -164,6 +164,95 @@ function start() {
   setTimeout(start, 250);
 })();
 
+
+/* ---------- background music: starts only on a tap, fades, pauses when hidden ---------- */
+const sndBtn = $('#sndBtn');
+const bgm = $('#bgm');
+const FADE = 1.2;
+let soundOn = false, audioCtx = null, audioGain = null, audioAnalyser = null, amp = 0, ampBuf = null;
+window.__diabloAmp = () => {
+  if (!audioAnalyser || !soundOn) { amp *= .9; return amp; }
+  if (!ampBuf) ampBuf = new Uint8Array(audioAnalyser.fftSize);
+  audioAnalyser.getByteTimeDomainData(ampBuf);
+  let s = 0;
+  for (let i = 0; i < ampBuf.length; i++) { const v = (ampBuf[i] - 128) / 128; s += v * v; }
+  const next = Math.min(1, Math.sqrt(s / ampBuf.length) * 3.2);
+  amp += (next - amp) * .16;
+  return amp;
+};
+function unlockAudio() {
+  if (audioCtx) {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return;
+  }
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    audioCtx = new AC();
+    const src = audioCtx.createMediaElementSource(bgm);
+    audioGain = audioCtx.createGain();
+    audioAnalyser = audioCtx.createAnalyser();
+    audioAnalyser.fftSize = 256;
+    audioAnalyser.smoothingTimeConstant = .85;
+    audioGain.gain.value = 0;
+    src.connect(audioGain);
+    audioGain.connect(audioAnalyser);
+    audioAnalyser.connect(audioCtx.destination);
+  } catch (err) {
+    audioCtx = audioGain = audioAnalyser = null;
+    console.warn('Web Audio unavailable, using element volume', err);
+  }
+}
+function fadeGain(to, after) {
+  if (audioGain && audioCtx) {
+    const g = audioGain.gain, now = audioCtx.currentTime;
+    g.cancelScheduledValues(now);
+    g.setValueAtTime(g.value, now);
+    g.linearRampToValueAtTime(to, now + FADE);
+    if (after) setTimeout(after, FADE * 1000 + 40);
+    return;
+  }
+  const from = bgm.volume, t0 = performance.now();
+  const tick = (now) => {
+    const t = Math.min(1, (now - t0) / (FADE * 1000));
+    bgm.volume = from + (to - from) * t;
+    if (t < 1) requestAnimationFrame(tick);
+    else if (after) after();
+  };
+  requestAnimationFrame(tick);
+}
+function setSoundUI(on) {
+  sndBtn.classList.toggle('on', on);
+  sndBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  sndBtn.setAttribute('aria-label', on ? 'Sound, on' : 'Sound, off');
+}
+async function startSound() {
+  unlockAudio();
+  bgm.loop = true;
+  if (!audioGain) bgm.volume = 0;
+  try { await bgm.play(); }
+  catch (err) { console.warn('Audio play blocked', err); return; }
+  soundOn = true;
+  setSoundUI(true);
+  try { localStorage.setItem('diablo-sound', 'on'); } catch {}
+  fadeGain(audioGain ? .72 : .72);
+}
+function stopSound() {
+  soundOn = false;
+  setSoundUI(false);
+  try { localStorage.setItem('diablo-sound', 'off'); } catch {}
+  fadeGain(0, () => { if (!soundOn) bgm.pause(); });
+}
+sndBtn.addEventListener('click', () => { soundOn ? stopSound() : startSound(); });
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    if (soundOn) { bgm.pause(); if (audioCtx && audioCtx.state === 'running') audioCtx.suspend(); }
+  } else if (soundOn) {
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    bgm.play().catch(() => {});
+  }
+});
+
 /* ---------- copy email ---------- */
 const copyBtn = $('#copyBtn');
 copyBtn.addEventListener('click', async () => {
