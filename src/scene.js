@@ -4,7 +4,7 @@
 // and heat in the fissures that opens up as you scroll. Ember dust drifts around it.
 import {
   WebGLRenderer, Scene, PerspectiveCamera, SphereGeometry, Mesh, ShaderMaterial, Color,
-  BufferGeometry, BufferAttribute, Points, AdditiveBlending, Vector3, Group,
+  BufferGeometry, BufferAttribute, Points, AdditiveBlending, Vector3, Group, Shape, ExtrudeGeometry,
 } from 'three';
 
 const NOISE = /* glsl */ `
@@ -77,9 +77,20 @@ void main(){
   gl_Position=projectionMatrix*viewMatrix*wp;
 }`;
 
+// the extruded brand mark: same material, object-space coordinates instead of a unit sphere
+const MARK_VERT = /* glsl */ `
+varying vec3 vObj; varying vec3 vW; varying vec3 vN;
+void main(){
+  vObj=position*1.0;
+  vec4 wp=modelMatrix*vec4(position,1.);
+  vW=wp.xyz;
+  vN=normalize(mat3(modelMatrix)*normal);
+  gl_Position=projectionMatrix*viewMatrix*wp;
+}`;
+
 const ROCK_FRAG = /* glsl */ `
 precision highp float;
-uniform float uTime,uHeat,uBump; uniform vec3 uLight,uEmber;
+uniform float uTime,uHeat,uBump,uWobble; uniform vec3 uLight,uEmber;
 varying vec3 vObj; varying vec3 vW; varying vec3 vN;
 ${NOISE}
 void main(){
@@ -89,6 +100,7 @@ void main(){
   float h=smoothstep(0.,.6,d)*1.1+snoise(vObj*11.)*.012;
   vec3 dpx=dFdx(vW),dpy=dFdy(vW);
   vec3 N=normalize(vN);
+  N=normalize(N+uWobble*vec3(snoise(vObj*2.6),snoise(vObj*2.6+5.),snoise(vObj*2.6+9.)));
   vec3 V=normalize(cameraPosition-vW);
   // derivative bump
   vec3 r1=cross(dpy,N),r2=cross(N,dpx);float det=dot(dpx,r1);
@@ -142,20 +154,20 @@ void main(){float d=length(gl_PointCoord-.5);float a=smoothstep(.5,.05,d)*vA;gl_
 // Where the form sits on screen as you scroll. sx/sy are -1..1 screen fractions, size is
 // the diameter as a fraction of viewport height. One table for wide screens, one for portrait.
 const KEYS_WIDE = {
-  hero:     { sx: .42,  sy: .06,  size: .66, heat: 1.0,  bump: 1.0 },
-  work:     { sx: .86,  sy: .20,  size: .34, heat: .45,  bump: 1.0 },
-  about:    { sx: -.78, sy: -.05, size: .40, heat: .6,   bump: 1.0 },
-  services: { sx: .86,  sy: -.15, size: .36, heat: .5,   bump: 1.0 },
-  process:  { sx: -.82, sy: .10,  size: .34, heat: .7,   bump: 1.0 },
-  contact:  { sx: .62,  sy: -.04, size: .80, heat: 1.45, bump: 1.0 },
+  hero:     { sx: .42,  sy: .06,  size: .66, heat: 1.0,  bump: 1.0, msize: 0,   msx: .56, msy: -.02, mheat: 1 },
+  work:     { sx: .86,  sy: .20,  size: .34, heat: .45,  bump: 1.0, msize: 0,   msx: .56, msy: -.02, mheat: 1 },
+  about:    { sx: -.78, sy: -.05, size: .40, heat: .6,   bump: 1.0, msize: 0,   msx: .56, msy: -.02, mheat: 1 },
+  services: { sx: .86,  sy: -.15, size: .36, heat: .5,   bump: 1.0, msize: 0,   msx: .56, msy: -.02, mheat: 1 },
+  process:  { sx: -.82, sy: .10,  size: .34, heat: .7,   bump: 1.0, msize: 0,   msx: .56, msy: -.02, mheat: 1 },
+  contact:  { sx: .95,  sy: .55,  size: .001,heat: 1.0,  bump: 1.0, msize: .58, msx: .56, msy: -.02, mheat: 1.1 },
 };
 const KEYS_TALL = {
-  hero:     { sx: 0,    sy: .52,  size: .34, heat: 1.0,  bump: 1.0 },
-  work:     { sx: .9,   sy: .55,  size: .22, heat: .4,   bump: 1.0 },
-  about:    { sx: .9,   sy: .55,  size: .22, heat: .5,   bump: 1.0 },
-  services: { sx: .9,   sy: .55,  size: .22, heat: .5,   bump: 1.0 },
-  process:  { sx: .9,   sy: .55,  size: .22, heat: .6,   bump: 1.0 },
-  contact:  { sx: 0,    sy: .70,  size: .27, heat: 1.45, bump: 1.0 },
+  hero:     { sx: 0,    sy: .52,  size: .34, heat: 1.0,  bump: 1.0, msize: 0,   msx: 0, msy: .66, mheat: 1 },
+  work:     { sx: .9,   sy: .55,  size: .22, heat: .4,   bump: 1.0, msize: 0,   msx: 0, msy: .66, mheat: 1 },
+  about:    { sx: .9,   sy: .55,  size: .22, heat: .5,   bump: 1.0, msize: 0,   msx: 0, msy: .66, mheat: 1 },
+  services: { sx: .9,   sy: .55,  size: .22, heat: .5,   bump: 1.0, msize: 0,   msx: 0, msy: .66, mheat: 1 },
+  process:  { sx: .9,   sy: .55,  size: .22, heat: .6,   bump: 1.0, msize: 0,   msx: 0, msy: .66, mheat: 1 },
+  contact:  { sx: .9,   sy: .55,  size: .001,heat: 1.0,  bump: 1.0, msize: .30, msx: .30, msy: .32, mheat: .7 },
 };
 const ORDER = ['hero', 'work', 'about', 'services', 'process', 'contact'];
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -187,11 +199,29 @@ export function initScene(canvas, opts = {}) {
   const geo = new SphereGeometry(1, mobile ? 120 : 220, mobile ? 90 : 160);
   const uni = {
     uTime: { value: 0 }, uHeat: { value: 0 }, uBump: { value: .5 },
-    uLight: { value: new Vector3(-.5, .7, .8) }, uEmber: { value: ember },
+    uLight: { value: new Vector3(-.5, .7, .8) }, uEmber: { value: ember }, uWobble: { value: 0 },
   };
   const rock = new Mesh(geo, new ShaderMaterial({ vertexShader: ROCK_VERT, fragmentShader: ROCK_FRAG, uniforms: uni }));
   rock.frustumCulled = false;
   group.add(rock);
+
+  // brand mark: the logo polygon extruded and bevelled, in the same obsidian + magma material
+  const MARK_PTS = [[512,48],[608,288],[608,416],[864,416],[864,560],[608,560],[608,720],[512,975],[416,720],[416,560],[160,560],[160,416],[416,416],[416,288]];
+  const shp = new Shape();
+  MARK_PTS.forEach(([x, y], i) => { const px_ = (x - 512) / 463.5, py_ = -(y - 511.5) / 463.5; i ? shp.lineTo(px_, py_) : shp.moveTo(px_, py_); });
+  shp.closePath();
+  const mgeo = new ExtrudeGeometry(shp, { depth: .34, bevelEnabled: true, bevelThickness: .035, bevelSize: .03, bevelSegments: 3, curveSegments: 1 });
+  mgeo.translate(0, 0, -.17);
+  const muni = {
+    uTime: uni.uTime, uHeat: { value: 0 }, uBump: { value: .22 }, uWobble: { value: .09 },
+    uLight: uni.uLight, uEmber: uni.uEmber,
+  };
+  const markMesh = new Mesh(mgeo, new ShaderMaterial({ vertexShader: MARK_VERT, fragmentShader: ROCK_FRAG, uniforms: muni }));
+  markMesh.frustumCulled = false;
+  const markGroup = new Group();
+  markGroup.add(markMesh);
+  markGroup.visible = false;
+  scene.add(markGroup);
 
   // ember dust
   const N = mobile ? 140 : 320;
@@ -223,10 +253,12 @@ export function initScene(canvas, opts = {}) {
   const readScroll = () => {
     scrollY_ = window.scrollY;
     const probe = scrollY_ + innerHeight * .5;
-    let a = anchors[0], b = anchors[0], t = 0;
-    for (let i = 0; i < anchors.length; i++) if (probe >= anchors[i].c) { a = anchors[i]; b = anchors[Math.min(i + 1, anchors.length - 1)]; }
-    if (probe < anchors[0].c) a = b = anchors[0];
-    else if (a !== b) t = ss(Math.min(1, Math.max(0, (probe - a.c) / (b.c - a.c))));
+    const maxProbe = document.documentElement.scrollHeight - innerHeight * .5;
+    const cs = anchors.map((x, i) => i === anchors.length - 1 ? Math.min(x.c, maxProbe - 8) : x.c);  // last key must be reachable at page bottom
+    let a = anchors[0], b = anchors[0], t = 0, ai = 0;
+    for (let i = 0; i < anchors.length; i++) if (probe >= cs[i]) { ai = i; a = anchors[i]; b = anchors[Math.min(i + 1, anchors.length - 1)]; }
+    if (probe < cs[0]) a = b = anchors[0];
+    else if (a !== b) t = ss(Math.min(1, Math.max(0, (probe - cs[ai]) / (cs[ai + 1] - cs[ai]))));
     const ka = KEYS[a.id], kb = KEYS[b.id];
     for (const k in ka) tgt[k] = lerp(ka[k], kb[k], t);
   };
@@ -274,6 +306,14 @@ export function initScene(canvas, opts = {}) {
     group.rotation.y = travelRot + scrollY_ * .0011 + mx * .35;
     group.rotation.x = .25 + scrollY_ * .0004 - my * .2;
     group.rotation.z = -.12;
+    const mRad = Math.max(0, cur.msize) * halfH * .5;     // mark height = msize * viewport height
+    markGroup.visible = mRad > .002;
+    if (markGroup.visible) {
+      markGroup.scale.setScalar(mRad * 2);
+      markGroup.position.set(cur.msx * halfW + mx * .05, cur.msy * halfH + my * .03, 0);
+      markGroup.rotation.set(Math.max(-.1, Math.min(.1, -my * .1)) + .03, Math.max(-.22, Math.min(.22, Math.sin(time * .35) * .13 + mx * .16)), 0);
+      muni.uHeat.value = cur.mheat * intro;
+    }
     uni.uHeat.value = cur.heat * intro;
     uni.uBump.value = .22 * cur.bump;
     duni.uAmt.value = (.5 + cur.heat * .5) * intro;
