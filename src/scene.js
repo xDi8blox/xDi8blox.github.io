@@ -265,7 +265,7 @@ export function initScene(canvas, opts = {}) {
     const active = pointerActive && now - lastMove < 2500;
     uni.uMouseOn.value = lerp(uni.uMouseOn.value, active ? 1 : 0, 1 - Math.pow(.05, dt));
     camera.position.set(mx * .7, cur.camY + my * .25, cur.camZ);
-    camera.lookAt(mx * 1.4, cur.look, -18);
+    camera.lookAt(mx * 1.4, cur.look + (camera.aspect < .8 ? -1.8 : 0), -18);
     camera.rotation.z += -mx * .012;
     if (!mobile && uni.uMouseOn.value > .01) {
       camera.updateMatrixWorld();
