@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Portfolio of Bruno Fend (xDi8blox), full-time developer.",
+  "description": "Portfolio of Diablo, full-time developer.",
   "scripts": {
     "dev": "vite --host --port 4800",
     "build": "vite build",
