@@ -1,0 +1,21 @@
+{
+  "name": "xdi8blox-portfolio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Portfolio of Bruno Fend (xDi8blox), full-time developer.",
+  "scripts": {
+    "dev": "vite --host --port 4800",
+    "build": "vite build",
+    "preview": "vite preview --host --port 4800"
+  },
+  "dependencies": {
+    "@fontsource-variable/geist": "^5.2.8",
+    "@fontsource-variable/geist-mono": "^5.2.7",
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.64.1",
+    "vite": "^8.3.6"
+  }
+}
