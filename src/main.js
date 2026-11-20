@@ -152,13 +152,13 @@ function start() {
   const tick = () => {
     if (done) return;
     const elapsed = performance.now() - t0;
-    p = Math.max(p, Math.min(0.92, elapsed / 1500)); // eased fake progress, jumps to 1 on ready
+    p = Math.max(p, Math.min(0.92, elapsed / 2200)); // eased fake progress, jumps to 1 on ready
     paint(); requestAnimationFrame(tick);
   };
   tick();
   const ready = Promise.all([boot(), document.fonts ? document.fonts.ready : 0]);
   await Promise.race([ready, new Promise((r) => setTimeout(r, 4000))]);
-  const wait = Math.max(0, 900 - (performance.now() - t0)); // never flash the loader
+  const wait = Math.max(0, 2300 - (performance.now() - t0)); // never flash the loader
   await new Promise((r) => setTimeout(r, wait));
   done = true; p = 1; paint();
   setTimeout(start, 250);

@@ -13,11 +13,14 @@
 <meta property="og:image" content="https://xdiablo.xyz/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <script>document.documentElement.classList.add('js')</script>
 </head>
 <body>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="mark" viewBox="160 48 704 927"><polygon points="512,48 608,288 608,416 864,416 864,560 608,560 608,720 512,975 416,720 416,560 160,560 160,416 416,416 416,288"/></symbol>
 <symbol id="arr" viewBox="0 0 16 16"><path d="M5 11L11 5M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="right" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="lock" viewBox="0 0 16 16"><rect x="3" y="7" width="10" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
@@ -28,6 +31,7 @@
 <!-- page-load sequence -->
 <div class="loader" id="loader" aria-hidden="true">
   <div class="loader-in">
+    <svg class="loader-mark" viewBox="150 38 724 947" aria-hidden="true"><path class="lm-stroke" pathLength="1" d="M512 48L608 288L608 416L864 416L864 560L608 560L608 720L512 975L416 720L416 560L160 560L160 416L416 416L416 288Z"/><path class="lm-fill" d="M512 48L608 288L608 416L864 416L864 560L608 560L608 720L512 975L416 720L416 560L160 560L160 416L416 416L416 288Z"/></svg>
     <div class="loader-word display"><span>D</span><span>I</span><span>A</span><span>B</span><span>L</span><span>O</span></div>
     <div class="loader-meta mono"><span>Loading</span><span id="loadn">000</span></div>
     <div class="loader-bar"><i id="loadbar"></i></div>
@@ -45,7 +49,7 @@
 
 <nav id="nav">
   <div class="wrap nav-in">
-    <a class="brand display" href="#hero" aria-label="Diablo, back to top">DIABLO</a>
+    <a class="brand" href="#hero" aria-label="Diablo, back to top"><svg class="mk" aria-hidden="true"><use href="#mark"/></svg><span class="display">DIABLO</span></a>
     <div class="links" id="links">
       <a href="#work" data-link>Work</a>
       <a href="#about" data-link>About</a>
@@ -286,7 +290,7 @@
 </main>
 
 <footer>
-  <div class="wrap mono"><span>© 2026 Diablo</span><span class="foot-r"><a class="ul" href="mailto:Humanoid118@gmail.com">Email</a><a class="gh-ico" href="https://github.com/xDi8blox" target="_blank" rel="noopener" aria-label="GitHub"><svg><use href="#gh"/></svg></a><a class="ul" href="#hero">Top</a></span></div>
+  <div class="wrap mono"><span class="foot-l"><svg class="mk" aria-hidden="true"><use href="#mark"/></svg>© 2026 Diablo</span><span class="foot-r"><a class="ul" href="mailto:Humanoid118@gmail.com">Email</a><a class="gh-ico" href="https://github.com/xDi8blox" target="_blank" rel="noopener" aria-label="GitHub"><svg><use href="#gh"/></svg></a><a class="ul" href="#hero">Top</a></span></div>
 </footer>
 
 <script type="module" src="/src/main.js"></script>
