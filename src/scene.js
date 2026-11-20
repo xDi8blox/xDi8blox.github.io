@@ -1,12 +1,13 @@
-// Signal terrain — a flowing, noise-displaced landscape rendered with custom shaders.
-// Solid ridgelines with topographic contours, an ember horizon haze and drifting ember dust.
-// Camera, terrain shape and lighting are keyed to scroll position (see KEYS below).
+// DIABLO — cracked obsidian with molten fissures.
+// A displaced mesh shaded entirely in custom GLSL: Worley-cell plates, derivative bump mapping,
+// a procedural studio environment (key light follows the cursor, ember rim from below),
+// and heat in the fissures that opens up as you scroll. Ember dust drifts around it.
 import {
-  WebGLRenderer, Scene, PerspectiveCamera, PlaneGeometry, Mesh, ShaderMaterial, Color,
-  BufferGeometry, BufferAttribute, Points, AdditiveBlending, Vector2, Vector3, Raycaster, Plane,
+  WebGLRenderer, Scene, PerspectiveCamera, SphereGeometry, Mesh, ShaderMaterial, Color,
+  BufferGeometry, BufferAttribute, Points, AdditiveBlending, Vector3, Group,
 } from 'three';
 
-const SIMPLEX = /* glsl */ `
+const NOISE = /* glsl */ `
 vec3 mod289(vec3 x){return x-floor(x*(1./289.))*289.;}
 vec4 mod289(vec4 x){return x-floor(x*(1./289.))*289.;}
 vec4 permute(vec4 x){return mod289(((x*34.)+1.)*x);}
@@ -29,259 +30,258 @@ float snoise(vec3 v){
   p0*=norm.x;p1*=norm.y;p2*=norm.z;p3*=norm.w;
   vec4 m=max(.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.);m=m*m;
   return 42.*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+}
+vec3 hash3(vec3 p){
+  p=vec3(dot(p,vec3(127.1,311.7,74.7)),dot(p,vec3(269.5,183.3,246.1)),dot(p,vec3(113.5,271.9,124.6)));
+  return fract(sin(p)*43758.5453);
+}
+// returns (F1, F2) distances to nearest feature points
+vec2 worley(vec3 p){
+  vec3 ip=floor(p),fp=fract(p);float f1=8.,f2=8.;
+  for(int k=-1;k<=1;k++)for(int j=-1;j<=1;j++)for(int i=-1;i<=1;i++){
+    vec3 g=vec3(float(i),float(j),float(k));
+    vec3 r=g+hash3(ip+g)-fp;float d=dot(r,r);
+    if(d<f1){f2=f1;f1=d;}else if(d<f2){f2=d;}
+  }
+  return sqrt(vec2(f1,f2));
+}
+// F2-F1 of a warped Worley field: ~0 on cell borders, used for both the fissures and the plate relief
+float crackField(vec3 p){
+  vec3 q=p*2.3+vec3(snoise(p*1.3),snoise(p*1.3+4.),snoise(p*1.3+9.))*.35;
+  vec2 w=worley(q);
+  return w.y-w.x;
 }`;
 
-const TERRAIN_VERT = /* glsl */ `
-uniform float uTime, uTravel, uAmp, uFreq, uSpeed;
-uniform vec2 uMouse; uniform float uMouseOn;
-varying float vH; varying vec3 vN; varying vec3 vW; varying float vMouse; varying float vRidge;
-${SIMPLEX}
-float field(vec2 p){
-  vec2 q=p*uFreq;
-  float t=uTime*uSpeed;
-  // domain warp for long, flowing ridges
-  vec2 w=vec2(snoise(vec3(q*.5,t)),snoise(vec3(q*.5+7.3,t)));
-  q+=w*.9;
-  float n=snoise(vec3(q,t*.6))*.62+snoise(vec3(q*2.1,t))*.26+snoise(vec3(q*4.3,t*1.4))*.12;
-  float r=1.-abs(snoise(vec3(q*.8+3.1,t*.5)));
-  return mix(n,r*r*1.2-.4,.55);
+const ROCK_VERT = /* glsl */ `
+uniform float uTime;
+varying vec3 vObj; varying vec3 vW; varying vec3 vN;
+${NOISE}
+float disp(vec3 p){
+  float plate=smoothstep(0.,.5,crackField(p));
+  float rough=snoise(p*1.7);
+  return .035*rough+.085*plate-.05;
 }
-float height(vec2 xz){
-  vec2 p=vec2(xz.x,xz.y-uTravel);
-  float corridor=smoothstep(0.,11.,abs(xz.x));      // gentler valley the camera flies down
-  float h=field(p)*uAmp*(.34+.66*corridor);
-  vec2 d=xz-uMouse;
-  float md=length(d);
-  h+=uMouseOn*exp(-md*md*.06)*sin(md*2.4-uTime*2.2)*.22*(.4+corridor);
-  return h;
-}
+vec3 surf(vec3 p){p=normalize(p);return p*(1.+disp(p));}
 void main(){
-  vec3 pos=position; // plane rotated: x,z in world
-  vec2 xz=pos.xz;
-  float h=height(xz);
-  float e=.35;
-  float hx=height(xz+vec2(e,0.));float hz=height(xz+vec2(0.,e));
-  vN=normalize(vec3(h-hx,e,h-hz));
-  pos.y=h; vH=h; vW=pos;
-  vMouse=uMouseOn*exp(-dot(xz-uMouse,xz-uMouse)*.045);
-  vRidge=smoothstep(.55,1.2,h/max(uAmp,.001));
-  gl_Position=projectionMatrix*modelViewMatrix*vec4(pos,1.);
+  vec3 p=normalize(position);
+  vec3 up=abs(p.y)>.95?vec3(1.,0.,0.):vec3(0.,1.,0.);
+  vec3 t1=normalize(cross(p,up)),t2=cross(p,t1);
+  float e=.01;
+  vec3 s0=surf(p),s1=surf(p+t1*e),s2=surf(p+t2*e);
+  vec3 n=normalize(cross(s1-s0,s2-s0));
+  if(dot(n,p)<0.)n=-n;
+  vObj=p;
+  vec4 wp=modelMatrix*vec4(s0,1.);
+  vW=wp.xyz;
+  vN=normalize(mat3(modelMatrix)*n);
+  gl_Position=projectionMatrix*viewMatrix*wp;
 }`;
 
-const TERRAIN_FRAG = /* glsl */ `
+const ROCK_FRAG = /* glsl */ `
 precision highp float;
-uniform vec3 uBg, uEmber; uniform float uLines, uEmberAmt, uFogNear, uFogFar, uTime, uLineAlpha;
-varying float vH; varying vec3 vN; varying vec3 vW; varying float vMouse; varying float vRidge;
-float contour(float v,float w){float f=abs(fract(v-.5)-.5)/max(fwidth(v)*w,1e-4);return 1.-clamp(f,0.,1.);}
+uniform float uTime,uHeat,uBump; uniform vec3 uLight,uEmber;
+varying vec3 vObj; varying vec3 vW; varying vec3 vN;
+${NOISE}
 void main(){
-  float dist=length(cameraPosition-vW);
-  float fog=smoothstep(uFogNear,uFogFar,dist);
-  float edge=smoothstep(30.,22.,abs(vW.x));
-  vec3 L=normalize(vec3(-.55,.5,.55));
-  float diff=max(dot(normalize(vN),L),0.);
-  vec3 col=uBg+vec3(.045,.043,.04)*diff;
-  float v=vH*uLines;
-  float minor=contour(v,1.1);
-  float major=contour(v/5.,1.4);
-  vec3 line=vec3(.62,.60,.57);
-  float la=(minor*.24+major*.62)*uLineAlpha;
-  col=mix(col,line,la);
-  // ember: ridge crests, cursor proximity, and a major-line accent
-  float ember=(vRidge*.55+vMouse*1.1)*uEmberAmt;
-  col+=uEmber*(major*ember*.9+minor*vMouse*uEmberAmt*.5)*.9;
-  col+=uEmber*vRidge*.03*uEmberAmt*diff;
-  // atmospheric haze, warmed toward the horizon
-  vec3 haze=mix(uBg,uEmber*.22,smoothstep(.45,1.,fog)*uEmberAmt);
-  col=mix(col,haze,fog);
-  col=mix(uBg,col,edge);
+  float d=crackField(vObj);
+  float width=.026+.03*uHeat;
+  float crack=1.-smoothstep(0.,width,d);
+  float h=smoothstep(0.,.6,d)*1.1+snoise(vObj*11.)*.012;
+  vec3 dpx=dFdx(vW),dpy=dFdy(vW);
+  vec3 N=normalize(vN);
+  vec3 V=normalize(cameraPosition-vW);
+  // derivative bump
+  vec3 r1=cross(dpy,N),r2=cross(N,dpx);float det=dot(dpx,r1);
+  float dhx=dFdx(h),dhy=dFdy(h);
+  vec3 grad=sign(det)*(dhx*r1+dhy*r2);
+  N=normalize(abs(det)*N-uBump*grad);
+  vec3 R=reflect(-V,N);
+  float ndv=clamp(dot(N,V),0.,1.);
+  float F=.05+.95*pow(1.-ndv,5.);
+  // procedural studio: key follows cursor, ember strip from below, dim fill
+  vec3 L=normalize(uLight);
+  vec3 env=mix(vec3(.006),vec3(.035,.033,.032),R.y*.5+.5);
+  env+=vec3(1.,.97,.93)*pow(max(dot(R,L),0.),70.)*3.0;
+  env+=vec3(.55,.58,.62)*pow(max(dot(R,L),0.),9.)*.22;
+  vec3 Le=normalize(vec3(-.55,-.6,.55));
+  env+=uEmber*pow(max(dot(R,Le),0.),7.)*1.15;
+  env+=uEmber*pow(1.-ndv,3.)*.30*smoothstep(-.2,.7,-R.y+.2);
+  vec3 col=vec3(.010)*(max(dot(N,L),0.)*2.+.2);
+  float gloss=.55+.45*smoothstep(.1,.5,d);   // plates polish, edges rougher
+  col+=env*(.07+.93*F)*gloss*1.9;
+  // molten fissures
+  float flow=.55+.45*snoise(vObj*5.+vec3(0.,uTime*.35,0.));
+  float t=clamp(crack*flow*1.25,0.,1.);
+  vec3 magma=mix(vec3(.22,.025,.01),uEmber*1.1,t);
+  magma+=vec3(1.,.72,.45)*pow(crack,4.)*.5*flow;
+  col=mix(col,col*.35,crack);
+  col+=magma*crack*uHeat;
+  col+=uEmber*exp(-d*20.)*.13*uHeat*(.6+.4*flow);   // warm bounce on the plate edges
+  col=col/(1.+col*.28);
   gl_FragColor=vec4(col,1.);
 }`;
 
 const DUST_VERT = /* glsl */ `
-uniform float uTime, uTravel, uPx, uAmt;
+uniform float uTime, uPx, uAmt;
 attribute vec4 aSeed; varying float vA;
 void main(){
   vec3 p=position;
-  float cyc=fract(aSeed.w+uTime*(.012+aSeed.z*.02));
-  p.y=cyc*9.;
-  p.x+=sin(uTime*.25+aSeed.x*30.)*.9;
-  p.z=mod(position.z+uTravel*.6+60.,80.)-62.;
+  float cyc=fract(aSeed.w+uTime*(.018+aSeed.z*.03));
+  p.y=mix(-4.8,4.8,cyc);
+  p.x+=sin(uTime*.3+aSeed.x*30.)*.5;
   vec4 mv=modelViewMatrix*vec4(p,1.);
   gl_Position=projectionMatrix*mv;
-  gl_PointSize=(1.4+aSeed.y*2.2)*uPx*(18./-mv.z);
-  float tw=.6+.4*sin(uTime*(1.5+aSeed.x*2.)+aSeed.y*20.);
-  vA=smoothstep(0.,.12,cyc)*smoothstep(1.,.5,cyc)*tw*uAmt*smoothstep(55.,8.,-mv.z);
+  gl_PointSize=(1.3+aSeed.y*2.4)*uPx*(6.2/-mv.z);
+  float tw=.55+.45*sin(uTime*(1.5+aSeed.x*2.)+aSeed.y*20.);
+  vA=smoothstep(0.,.1,cyc)*smoothstep(1.,.55,cyc)*tw*uAmt;
 }`;
 const DUST_FRAG = /* glsl */ `
 precision mediump float; uniform vec3 uEmber; varying float vA;
 void main(){float d=length(gl_PointCoord-.5);float a=smoothstep(.5,.05,d)*vA;gl_FragColor=vec4(uEmber*a,a);}`;
 
-const SKY_VERT = /* glsl */ `varying vec2 vN; void main(){vN=position.xy;gl_Position=vec4(position.xy,.9999,1.);}`;
-const SKY_FRAG = /* glsl */ `
-precision highp float; uniform mat4 uInvProj, uCam; uniform vec3 uBg, uEmber; uniform float uEmberAmt, uHorizon; varying vec2 vN;
-void main(){
-  vec3 d=normalize((uCam*vec4((uInvProj*vec4(vN,1.,1.)).xyz,0.)).xyz);
-  float y=d.y-uHorizon;
-  float band=exp(-pow(y*7.5,2.))*.55+exp(-pow(y*2.6,2.))*.25;
-  float sideFade=exp(-pow(d.x*1.6,2.));
-  vec3 col=uBg+uEmber*band*sideFade*.20*uEmberAmt;
-  gl_FragColor=vec4(col,1.);
-}`;
-
-// scroll keyframes, one per section anchor (id). Values lerp between neighbours.
-const KEYS = {
-  hero:     { amp: 6.2, camY: 3.8, camZ: 14, look: 2.8, ember: 1.0, lines: 2.4, lineA: 1.0, speed: 1.0 },
-  about:    { amp: 4.6, camY: 4.6, camZ: 13, look: 0.8, ember: 0.6, lines: 2.4, lineA: .8, speed: .7 },
-  services: { amp: 3.2, camY: 5.8, camZ: 12, look: -1.0, ember: 0.45, lines: 2.2, lineA: .6, speed: .5 },
-  work:     { amp: 2.2, camY: 7.2, camZ: 11, look: -2.0, ember: 0.35, lines: 2.8, lineA: .5, speed: .4 },
-  process:  { amp: 4.2, camY: 4.4, camZ: 13, look: 0.0, ember: 0.65, lines: 1.9, lineA: .75, speed: .7 },
-  contact:  { amp: 7.0, camY: 3.0, camZ: 14, look: 3.0, ember: 1.4, lines: 2.2, lineA: 1.0, speed: 1.0 },
+// Where the form sits on screen as you scroll. sx/sy are -1..1 screen fractions, size is
+// the diameter as a fraction of viewport height. One table for wide screens, one for portrait.
+const KEYS_WIDE = {
+  hero:     { sx: .42,  sy: .06,  size: .66, heat: 1.0,  bump: 1.0 },
+  work:     { sx: .86,  sy: .20,  size: .34, heat: .45,  bump: 1.0 },
+  about:    { sx: -.78, sy: -.05, size: .40, heat: .6,   bump: 1.0 },
+  services: { sx: .86,  sy: -.15, size: .36, heat: .5,   bump: 1.0 },
+  process:  { sx: -.82, sy: .10,  size: .34, heat: .7,   bump: 1.0 },
+  contact:  { sx: .62,  sy: -.04, size: .80, heat: 1.45, bump: 1.0 },
 };
-const ORDER = ['hero', 'about', 'services', 'work', 'process', 'contact'];
+const KEYS_TALL = {
+  hero:     { sx: 0,    sy: .52,  size: .34, heat: 1.0,  bump: 1.0 },
+  work:     { sx: .9,   sy: .55,  size: .22, heat: .4,   bump: 1.0 },
+  about:    { sx: .9,   sy: .55,  size: .22, heat: .5,   bump: 1.0 },
+  services: { sx: .9,   sy: .55,  size: .22, heat: .5,   bump: 1.0 },
+  process:  { sx: .9,   sy: .55,  size: .22, heat: .6,   bump: 1.0 },
+  contact:  { sx: 0,    sy: .70,  size: .27, heat: 1.45, bump: 1.0 },
+};
+const ORDER = ['hero', 'work', 'about', 'services', 'process', 'contact'];
 const lerp = (a, b, t) => a + (b - a) * t;
 const ss = (t) => t * t * (3 - 2 * t);
+const ease = (t) => 1 - Math.pow(1 - t, 4);
 
 export function initScene(canvas, opts = {}) {
   const reduced = !!opts.reduced;
   const mobile = matchMedia('(max-width: 820px), (pointer: coarse)').matches;
   let renderer;
   try {
-    renderer = new WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: 'high-performance', failIfMajorPerformanceCaveat: false });
+    renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true, premultipliedAlpha: true, powerPreference: 'high-performance' });
   } catch (e) { return null; }
   if (!renderer.getContext()) return null;
   const MAXDPR = mobile ? 1.5 : 1.75;
   let dpr = Math.min(window.devicePixelRatio || 1, MAXDPR);
   renderer.setPixelRatio(dpr);
-  const bg = new Color('#0a0a0a');
-  renderer.setClearColor(bg, 1);
+  renderer.setClearColor(0x000000, 0);
 
   const scene = new Scene();
-  const camera = new PerspectiveCamera(48, 1, .1, 140);
+  const FOV = 32, DIST = 6.2;
+  const camera = new PerspectiveCamera(FOV, 1, .1, 40);
+  camera.position.set(0, 0, DIST);
+  const halfH = DIST * Math.tan((FOV * Math.PI) / 360);
   const ember = new Color('#ee6a3c');
 
-  // sky: horizon haze behind the terrain
-  const skyU = { uInvProj: { value: camera.projectionMatrixInverse }, uCam: { value: camera.matrixWorld }, uBg: { value: bg }, uEmber: { value: ember }, uEmberAmt: { value: 1 }, uHorizon: { value: 0 } };
-  const sky = new Mesh(new PlaneGeometry(2, 2), new ShaderMaterial({ vertexShader: SKY_VERT, fragmentShader: SKY_FRAG, uniforms: skyU, depthWrite: false, depthTest: false }));
-  sky.frustumCulled = false; sky.renderOrder = -10;
-  scene.add(sky);
-
-  // terrain
-  const segX = mobile ? 96 : 190, segZ = mobile ? 120 : 250;
-  const geo = new PlaneGeometry(64, 86, segX, segZ);
-  geo.rotateX(-Math.PI / 2);
-  geo.translate(0, 0, -22);
+  const group = new Group();
+  scene.add(group);
+  const geo = new SphereGeometry(1, mobile ? 120 : 220, mobile ? 90 : 160);
   const uni = {
-    uTime: { value: 0 }, uTravel: { value: 0 }, uAmp: { value: 3 }, uFreq: { value: .09 }, uSpeed: { value: .06 },
-    uMouse: { value: new Vector2(999, 999) }, uMouseOn: { value: 0 },
-    uBg: { value: bg }, uEmber: { value: ember }, uLines: { value: 3 }, uEmberAmt: { value: 1 },
-    uFogNear: { value: 14 }, uFogFar: { value: 62 }, uLineAlpha: { value: 1 },
+    uTime: { value: 0 }, uHeat: { value: 0 }, uBump: { value: .5 },
+    uLight: { value: new Vector3(-.5, .7, .8) }, uEmber: { value: ember },
   };
-  const mat = new ShaderMaterial({ vertexShader: TERRAIN_VERT, fragmentShader: TERRAIN_FRAG, uniforms: uni });
-  const terrain = new Mesh(geo, mat);
-  terrain.frustumCulled = false;
-  scene.add(terrain);
+  const rock = new Mesh(geo, new ShaderMaterial({ vertexShader: ROCK_VERT, fragmentShader: ROCK_FRAG, uniforms: uni }));
+  rock.frustumCulled = false;
+  group.add(rock);
 
   // ember dust
-  const N = mobile ? 380 : 900;
+  const N = mobile ? 140 : 320;
   const dg = new BufferGeometry();
   const pos = new Float32Array(N * 3), seed = new Float32Array(N * 4);
   for (let i = 0; i < N; i++) {
-    pos[i * 3] = (Math.random() - .5) * 46; pos[i * 3 + 1] = 0; pos[i * 3 + 2] = Math.random() * 80 - 62;
+    pos[i * 3] = (Math.random() - .5) * 9; pos[i * 3 + 1] = 0; pos[i * 3 + 2] = (Math.random() - .5) * 4 - .3;
     seed[i * 4] = Math.random(); seed[i * 4 + 1] = Math.random(); seed[i * 4 + 2] = Math.random(); seed[i * 4 + 3] = Math.random();
   }
   dg.setAttribute('position', new BufferAttribute(pos, 3));
   dg.setAttribute('aSeed', new BufferAttribute(seed, 4));
-  const duni = { uTime: uni.uTime, uTravel: uni.uTravel, uPx: { value: dpr }, uAmt: { value: 1 }, uEmber: { value: ember } };
-  const dust = new Points(dg, new ShaderMaterial({
-    vertexShader: DUST_VERT, fragmentShader: DUST_FRAG, uniforms: duni,
-    transparent: true, depthWrite: false, blending: AdditiveBlending,
-  }));
+  const duni = { uTime: uni.uTime, uPx: { value: dpr }, uAmt: { value: 1 }, uEmber: { value: ember } };
+  const dust = new Points(dg, new ShaderMaterial({ vertexShader: DUST_VERT, fragmentShader: DUST_FRAG, uniforms: duni, transparent: true, depthWrite: false, blending: AdditiveBlending }));
   dust.frustumCulled = false;
   scene.add(dust);
 
-  // layout / scroll mapping
+  // scroll mapping
   let anchors = [];
   const measure = () => {
     anchors = ORDER.map((id) => {
-      const el = document.getElementById(id);
-      if (!el) return null;
+      const el = document.getElementById(id); if (!el) return null;
       const r = el.getBoundingClientRect();
       return { id, c: r.top + scrollY + r.height / 2 };
     }).filter(Boolean);
   };
+  let KEYS = KEYS_WIDE;
   const cur = { ...KEYS.hero }; const tgt = { ...KEYS.hero };
-  let travelBase = 0, scrollY_ = 0;
+  let scrollY_ = 0;
   const readScroll = () => {
     scrollY_ = window.scrollY;
     const probe = scrollY_ + innerHeight * .5;
     let a = anchors[0], b = anchors[0], t = 0;
-    for (let i = 0; i < anchors.length; i++) {
-      if (probe >= anchors[i].c) { a = anchors[i]; b = anchors[Math.min(i + 1, anchors.length - 1)]; }
-    }
-    if (probe < anchors[0].c) { a = b = anchors[0]; }
+    for (let i = 0; i < anchors.length; i++) if (probe >= anchors[i].c) { a = anchors[i]; b = anchors[Math.min(i + 1, anchors.length - 1)]; }
+    if (probe < anchors[0].c) a = b = anchors[0];
     else if (a !== b) t = ss(Math.min(1, Math.max(0, (probe - a.c) / (b.c - a.c))));
     const ka = KEYS[a.id], kb = KEYS[b.id];
     for (const k in ka) tgt[k] = lerp(ka[k], kb[k], t);
-    scene.userData.progress = Math.min(1, scrollY_ / Math.max(1, document.documentElement.scrollHeight - innerHeight));
   };
 
-  // pointer → world-space point on the ground plane
-  const ray = new Raycaster(), ground = new Plane(new Vector3(0, 1, 0), 0), hit = new Vector3(), ndc = new Vector2();
-  let mx = 0, my = 0, pxTarget = 0, pyTarget = 0, pointerActive = false, lastMove = 0;
-  const onMove = (e) => {
-    const x = e.clientX / innerWidth, y = e.clientY / innerHeight;
-    ndc.set(x * 2 - 1, -(y * 2 - 1)); pxTarget = ndc.x; pyTarget = ndc.y;
-    pointerActive = true; lastMove = performance.now();
-  };
-  if (!mobile) addEventListener('pointermove', onMove, { passive: true });
+  let mx = 0, my = 0, px = 0, py = 0, lastMove = 0;
+  if (!mobile) addEventListener('pointermove', (e) => { px = e.clientX / innerWidth * 2 - 1; py = -(e.clientY / innerHeight * 2 - 1); lastMove = performance.now(); }, { passive: true });
+  // phones: a slow idle sweep stands in for the cursor so the light still plays across the surface
+  let introStart = -1;
+  const startIntro = () => { introStart = performance.now(); };
+  if (reduced) introStart = 0;
 
   const resize = () => {
     const w = innerWidth, h = innerHeight;
     renderer.setSize(w, h, false);
-    camera.aspect = w / h;
-    camera.fov = w / h < .8 ? 62 : 48;
-    camera.updateProjectionMatrix();
+    camera.aspect = w / h; camera.updateProjectionMatrix();
+    KEYS = w / h < .85 ? KEYS_TALL : KEYS_WIDE;
     measure(); readScroll();
-    if (reduced) { Object.assign(cur, tgt); frame(0, true); }
+    if (reduced) { Object.assign(cur, tgt); frame(performance.now(), true); }
   };
 
-  let t0 = performance.now(), last = t0, running = false, raf = 0, slow = 0, frames = 0;
-  const hud = opts.hud || (() => {});
+  let t0 = performance.now(), last = t0, running = false, raf = 0, slow = 0, frames = 0, travelRot = 0;
   function frame(now, still) {
     const dt = Math.min(.05, (now - last) / 1000 || .016); last = now;
-    const time = reduced ? 8 : (now - t0) / 1000;
+    const time = reduced ? 6 : (now - t0) / 1000;
     uni.uTime.value = time;
     readScroll();
-    const k = reduced ? 1 : 1 - Math.pow(.0015, dt); // frame-rate independent damping
+    const k = reduced ? 1 : 1 - Math.pow(.002, dt);
     for (const key in tgt) cur[key] = lerp(cur[key], tgt[key], k);
-    travelBase += reduced ? 0 : dt * 1.1 * cur.speed;
-    const travel = reduced ? 10 : travelBase + scrollY_ * .006;
-    uni.uTravel.value = travel;
-    uni.uAmp.value = cur.amp; uni.uLines.value = cur.lines; uni.uLineAlpha.value = cur.lineA;
-    uni.uEmberAmt.value = cur.ember; skyU.uEmberAmt.value = cur.ember; duni.uAmt.value = .5 + cur.ember * .6;
 
-    // smooth pointer
-    mx = lerp(mx, pxTarget, 1 - Math.pow(.01, dt)); my = lerp(my, pyTarget, 1 - Math.pow(.01, dt));
-    const active = pointerActive && now - lastMove < 2500;
-    uni.uMouseOn.value = lerp(uni.uMouseOn.value, active ? 1 : 0, 1 - Math.pow(.05, dt));
-    camera.position.set(mx * .7, cur.camY + my * .25, cur.camZ);
-    camera.lookAt(mx * 1.4, cur.look + (camera.aspect < .8 ? -1.8 : 0), -18);
-    camera.rotation.z += -mx * .012;
-    if (!mobile && uni.uMouseOn.value > .01) {
-      camera.updateMatrixWorld();
-      ray.setFromCamera(ndc, camera);
-      if (ray.ray.intersectPlane(ground, hit)) uni.uMouse.value.set(hit.x, hit.z);
-    }
-    camera.updateMatrixWorld(); skyU.uHorizon.value = -0.03;
+    const introT = introStart < 0 ? 0 : Math.min(1, (now - introStart) / (reduced ? 1 : 2800));
+    const intro = reduced ? 1 : ease(introT);
+    // pointer (desktop) or idle sweep (touch)
+    let tx = px, ty = py;
+    if (mobile || now - lastMove > 4000) { tx = Math.sin(time * .35) * .6; ty = Math.cos(time * .27) * .35; }
+    mx = lerp(mx, tx, 1 - Math.pow(.02, dt)); my = lerp(my, ty, 1 - Math.pow(.02, dt));
+    uni.uLight.value.set(mx * 1.6 - .1, my * 1.1 + .55, 1.0);
+
+    const aspect = camera.aspect;
+    const halfW = halfH * aspect;
+    const radius = cur.size * halfH;                      // size is a diameter fraction of height => radius = size*halfH
+    const s = radius * (.82 + .18 * intro);
+    group.scale.setScalar(Math.max(.0001, s) * intro + .0001);
+    group.position.set(cur.sx * halfW + mx * .06, cur.sy * halfH + my * .04, 0);
+    travelRot += dt * .06;
+    group.rotation.y = travelRot + scrollY_ * .0011 + mx * .35;
+    group.rotation.x = .25 + scrollY_ * .0004 - my * .2;
+    group.rotation.z = -.12;
+    uni.uHeat.value = cur.heat * intro;
+    uni.uBump.value = .22 * cur.bump;
+    duni.uAmt.value = (.5 + cur.heat * .5) * intro;
     renderer.render(scene, camera);
-    hud(travel, cur);
 
-    // adaptive resolution: if we are consistently slow, step the pixel ratio down
-    if (!still && !reduced && ++frames > 30) {
-      slow = dt > .026 ? slow + 1 : Math.max(0, slow - 1);
-      if (slow > 40 && dpr > .8) {
-        dpr = Math.max(.75, dpr - .25); renderer.setPixelRatio(dpr); duni.uPx.value = dpr; slow = 0; resize();
-      }
+    if (!still && !reduced && introStart >= 0 && ++frames > 40) {
+      slow = dt > .028 ? slow + 1 : Math.max(0, slow - 1);
+      if (slow > 40 && dpr > .8) { dpr = Math.max(.75, dpr - .25); renderer.setPixelRatio(dpr); duni.uPx.value = dpr; slow = 0; resize(); }
     }
   }
   const loop = (now) => { if (!running) return; frame(now); raf = requestAnimationFrame(loop); };
@@ -292,11 +292,11 @@ export function initScene(canvas, opts = {}) {
   canvas.addEventListener('webglcontextrestored', start);
   addEventListener('resize', resize);
   if (document.fonts) document.fonts.ready.then(() => { measure(); readScroll(); });
-  new ResizeObserver(() => { measure(); }).observe(document.body);
+  new ResizeObserver(measure).observe(document.body);
 
   resize();
   Object.assign(cur, tgt);
   frame(performance.now(), true);
   start();
-  return { stop, start, renderer, mobile };
+  return { stop, start, startIntro, renderer, mobile };
 }

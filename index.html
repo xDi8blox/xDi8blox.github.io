@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>xDi8blox — Bruno Fend, full-time developer</title>
-<meta name="description" content="Bruno Fend (xDi8blox) is a full-time independent developer building trading bots, betting systems, Telegram tooling, crypto dashboards, websites and interactive 3D web apps.">
+<title>Diablo — Full-time developer</title>
+<meta name="description" content="Diablo is a full-time developer building trading bots, betting systems, crypto tooling, websites and interactive 3D web apps. Home of Nuviro.app.">
 <meta name="theme-color" content="#0a0a0a">
-<meta property="og:title" content="xDi8blox — Full-time developer">
-<meta property="og:description" content="Trading bots, betting systems, crypto tooling and interactive web apps. Seven live projects you can open now.">
+<meta property="og:title" content="Diablo — Full-time developer">
+<meta property="og:description" content="Trading bots, betting systems, crypto tooling and interactive web apps. Built to run while you sleep.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://xdiablo.xyz/">
 <meta property="og:image" content="https://xdiablo.xyz/og.jpg">
@@ -22,86 +22,166 @@
 <symbol id="right" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="lock" viewBox="0 0 16 16"><rect x="3" y="7" width="10" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
 <symbol id="gh" viewBox="0 0 16 16"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38v-1.33c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.22 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 014 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></symbol>
+<symbol id="copy" viewBox="0 0 16 16"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 3.5v-.2a1.3 1.3 0 00-1.3-1.3H3.8a1.3 1.3 0 00-1.3 1.3v5.4a1.3 1.3 0 001.3 1.3h.2" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
 </defs></svg>
 
 <!-- page-load sequence -->
 <div class="loader" id="loader" aria-hidden="true">
   <div class="loader-in">
-    <div class="loader-word"><span class="mark"><i></i></span>xDi8blox</div>
-    <div class="loader-meta mono"><span>Loading terrain</span><span id="loadn">000</span></div>
+    <div class="loader-word display"><span>D</span><span>I</span><span>A</span><span>B</span><span>L</span><span>O</span></div>
+    <div class="loader-meta mono"><span>Loading</span><span id="loadn">000</span></div>
     <div class="loader-bar"><i id="loadbar"></i></div>
   </div>
 </div>
 
-<canvas id="gl" aria-hidden="true"></canvas>
 <div class="fallback-bg" aria-hidden="true"></div>
+<div class="mega display" id="mega" aria-hidden="true">
+  <span class="row"><span class="ch">D</span><span class="ch">I</span><span class="ch">A</span></span><span class="row"><span class="ch">B</span><span class="ch">L</span><span class="ch">O</span></span>
+</div>
+<canvas id="gl" aria-hidden="true"></canvas>
 <div class="vignette" aria-hidden="true"></div>
 <div class="grain" aria-hidden="true"></div>
 <div class="progress" id="progress" aria-hidden="true"></div>
-<div class="rails" aria-hidden="true"><div class="wrap"></div></div>
 
 <nav id="nav">
   <div class="wrap nav-in">
-    <a class="brand" href="#hero" aria-label="xDi8blox, back to top"><span class="mark"><i></i></span>xDi8blox</a>
+    <a class="brand display" href="#hero" aria-label="Diablo, back to top">DIABLO</a>
     <div class="links" id="links">
       <a href="#work" data-link>Work</a>
       <a href="#about" data-link>About</a>
       <a href="#services" data-link>Services</a>
       <a href="#process" data-link>Process</a>
-      <a href="#stack" data-link>Stack</a>
       <a href="#contact" data-link>Contact</a>
     </div>
     <div class="navr">
-      <span class="status"><span class="dot"></span>Taking new projects</span>
-      <a class="btn sm sec" href="https://github.com/xDi8blox" target="_blank" rel="noopener"><svg><use href="#gh"/></svg>GitHub</a>
+      <a class="nav-mail mono" href="mailto:Humanoid118@gmail.com">Humanoid118@gmail.com<svg><use href="#arr"/></svg></a>
       <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false"><i></i><i></i></button>
     </div>
   </div>
 </nav>
 <div class="sheet" id="sheet" aria-hidden="true">
-  <a href="#work">Work</a><a href="#about">About</a><a href="#services">Services</a><a href="#process">Process</a><a href="#stack">Stack</a><a href="#contact">Contact</a>
+  <a href="#work" class="display">Work</a><a href="#about" class="display">About</a><a href="#services" class="display">Services</a><a href="#process" class="display">Process</a><a href="#contact" class="display">Contact</a>
+  <a class="sheet-mail mono" href="mailto:Humanoid118@gmail.com">Humanoid118@gmail.com</a>
 </div>
 
 <main>
 <!-- HERO -->
 <section class="hero" id="hero">
-  <div class="wrap">
+  <h1 class="sr">Diablo — full-time developer</h1>
+  <div class="wrap hero-grid">
     <div class="hero-copy">
-      <div class="eyebrow" data-hero="0"><b>Full-time</b>Independent developer since 2021</div>
-      <h1 id="h1" aria-label="I build trading bots, betting systems and interactive web apps.">
-        <span class="line"><span class="w">I</span> <span class="w">build</span> <span class="w">trading</span> <span class="w">bots,</span></span>
-        <span class="line"><span class="w">betting</span> <span class="w">systems</span></span>
-        <span class="line dim"><span class="w">and</span> <span class="w">interactive</span> <span class="w">web</span> <span class="w">apps.</span></span>
-      </h1>
-      <p class="lede" data-hero="4">Full-time developer. I ship automated trading and betting systems, Telegram tooling and crypto dashboards, plus fast, animated websites and 3D experiences that hold up on a phone.</p>
-      <div class="ctas" data-hero="5">
-        <a class="btn pri" href="#work" data-magnetic>View selected work<svg><use href="#right"/></svg></a>
-        <a class="btn sec" href="#contact" data-magnetic>Contact</a>
-      </div>
+      <p class="tagline display" data-hero="1"><span class="tl">Built to run</span> <span class="tl"><em>while you sleep.</em></span></p>
+      <p class="lede" data-hero="3">Full-time developer: trading bots, betting systems, crypto tooling and websites that move.</p>
+      <a class="mail-link" href="mailto:Humanoid118@gmail.com" data-hero="4" data-magnetic><span class="mono">Start a project</span><b>Humanoid118@gmail.com</b><svg><use href="#arr"/></svg></a>
     </div>
-    <aside class="hud mono" data-hero="6" aria-hidden="true">
-      <div><span>Traverse</span><b id="hudT">0000.0</b></div>
-      <div><span>Elevation</span><b id="hudE">0.00</b></div>
-      <div><span>Sector</span><b id="hudS">Hero</b></div>
-    </aside>
   </div>
-  <div class="scroll-cue mono" data-hero="6"><span>Scroll</span><i></i></div>
+  <div class="wrap hero-meta mono" data-hero="5">
+    <span><i>Based</i>UTC+1, remote</span>
+    <span><i>Focus</i>Automation · Trading · Interactive web</span>
+    <span class="hm-scroll"><i>Scroll</i><u></u></span>
+  </div>
 </section>
 
-<!-- STATS -->
+<!-- INDEX -->
 <section class="stats panel" aria-label="At a glance">
   <div class="wrap">
-    <div class="stat" data-reveal><div class="n"><span data-count="7">7</span></div><div class="l">Live projects you can open in the browser</div></div>
-    <div class="stat" data-reveal><div class="n"><span data-count="20" id="repoCount">20</span></div><div class="l">Public repositories on GitHub</div></div>
-    <div class="stat" data-reveal><div class="n"><span data-count="5" data-suffix="+">5+</span></div><div class="l">Years developing, since 2021</div></div>
-    <div class="stat" data-reveal><div class="n">Solana <em>+</em> EVM</div><div class="l">On-chain tooling and wallets</div></div>
+    <div class="stat" data-reveal><div class="n display"><span data-count="8">8</span></div><div class="l mono">Live sites</div></div>
+    <div class="stat" data-reveal><div class="n display"><span data-count="4">4</span></div><div class="l mono">Private systems</div></div>
+    <div class="stat" data-reveal><div class="n display"><span data-count="2021" data-from="2000">2021</span></div><div class="l mono">Full-time since</div></div>
+    <div class="stat" data-reveal><div class="n display">Solana <em>&amp;</em> EVM</div><div class="l mono">On-chain tooling</div></div>
   </div>
 </section>
 
-<section class="marquee panel" aria-hidden="true">
-  <div class="track mono">
-    <span>TypeScript</span><i></i><span>JavaScript</span><i></i><span>Python</span><i></i><span>React</span><i></i><span>Three.js</span><i></i><span>GLSL</span><i></i><span>Node.js</span><i></i><span>Solana</span><i></i><span>Telegram Bot API</span><i></i><span>WebSockets</span><i></i><span>Shopify</span><i></i><span>WordPress</span><i></i>
-    <span>TypeScript</span><i></i><span>JavaScript</span><i></i><span>Python</span><i></i><span>React</span><i></i><span>Three.js</span><i></i><span>GLSL</span><i></i><span>Node.js</span><i></i><span>Solana</span><i></i><span>Telegram Bot API</span><i></i><span>WebSockets</span><i></i><span>Shopify</span><i></i><span>WordPress</span><i></i>
+<!-- WORK -->
+<section class="block panel" id="work">
+  <div class="wrap">
+    <div class="sechead">
+      <div><div class="kicker mono" data-reveal>(01) Selected work</div><h2 class="display" data-split>The ones you can open.</h2></div>
+      <p data-reveal>Eight live sites, starting with the one that has real users on it. Everything links straight to the running product.</p>
+    </div>
+
+    <!-- flagship -->
+    <article class="feature" data-reveal data-tilt>
+      <a class="stretch" href="https://nuviro.app" target="_blank" rel="noopener" aria-label="Nuviro, open the live site"></a>
+      <div class="feature-shots">
+        <div class="f-desk"><img src="/img/nuviro.webp" alt="Nuviro home page: Verify and grow, with a live orders panel" width="1600" height="1000" loading="lazy"></div>
+      </div>
+      <div class="feature-body">
+        <div class="mono f-flag">First live site <span>·</span> Flagship</div>
+        <h3 class="display">Nuviro</h3>
+        <p>A prepaid-wallet platform for renting phone numbers for supported verification services, or boosting social accounts, across a live catalogue of countries and services. Fund once, order in seconds, watch delivery and codes arrive in the order feed.</p>
+        <div class="tags mono"><span class="tag">Full-stack</span><span class="tag">Accounts &amp; wallet</span><span class="tag">Live catalogue</span><span class="tag">Admin console</span></div>
+        <span class="f-visit mono">nuviro.app<svg><use href="#arr"/></svg></span>
+      </div>
+    </article>
+
+    <div class="grid" data-stagger>
+      <article class="card c7" data-reveal data-tilt>
+        <a class="stretch" href="https://xdi8blox.github.io/sendit-terminal/" target="_blank" rel="noopener" aria-label="Sendit Terminal, live demo"></a>
+        <div class="img"><img src="/img/sendit.webp" alt="Sendit Terminal: order book, candle chart and Solana meme radar" loading="lazy" width="1280" height="800"></div>
+        <div class="meta"><div class="row"><h3>Sendit Terminal</h3><span class="live mono">Live<svg><use href="#arr"/></svg></span></div>
+          <p>Live crypto market terminal: streaming Binance order book and candles, a Solana meme-coin radar, keyboard-driven paper trading.</p>
+          <div class="tags mono"><span class="tag">TypeScript</span><span class="tag">WebSockets</span><span class="tag">Binance</span><span class="tag">DexScreener</span></div></div>
+      </article>
+      <article class="card c5" data-reveal data-tilt>
+        <a class="stretch" href="https://xdi8blox.github.io/neon-apex/" target="_blank" rel="noopener" aria-label="HELLDRIVE, live demo"></a>
+        <div class="img"><img src="/img/helldrive.webp" alt="HELLDRIVE: 3D racing at night with a supercar" loading="lazy" width="1280" height="720"></div>
+        <div class="meta"><div class="row"><h3>HELLDRIVE</h3><span class="live mono">Live<svg><use href="#arr"/></svg></span></div>
+          <p>3D arcade racer with PBR supercars, HDRI lighting, nitro, AI rivals and full touch controls.</p>
+          <div class="tags mono"><span class="tag">Three.js</span><span class="tag">glTF</span><span class="tag">Mobile</span></div></div>
+      </article>
+      <article class="card c4" data-reveal data-tilt>
+        <a class="stretch" href="https://xdi8blox.github.io/bagscope/" target="_blank" rel="noopener" aria-label="Bagscope, live demo"></a>
+        <div class="img"><img src="/img/bagscope.webp" alt="Bagscope wallet dashboard with PnL chart and allocation" loading="lazy" width="1280" height="800"></div>
+        <div class="meta"><div class="row"><h3>Bagscope</h3><span class="live mono">Live<svg><use href="#arr"/></svg></span></div>
+          <p>Scope any Solana or EVM wallet: holdings, PnL, swaps and NFTs. No API key needed.</p>
+          <div class="tags mono"><span class="tag">React</span><span class="tag">Solana</span><span class="tag">EVM</span></div></div>
+      </article>
+      <article class="card c4" data-reveal data-tilt>
+        <a class="stretch" href="https://xdi8blox.github.io/bloodrite/" target="_blank" rel="noopener" aria-label="BLOODRITE, live demo"></a>
+        <div class="img"><img src="/img/bloodrite.webp" alt="BLOODRITE: two rigged fighters in a gothic arena" loading="lazy" width="1280" height="720"></div>
+        <div class="meta"><div class="row"><h3>BLOODRITE</h3><span class="live mono">Live<svg><use href="#arr"/></svg></span></div>
+          <p>Gothic 2.5D fighting game with rigged characters, finishers and rollback-netcode online 1v1.</p>
+          <div class="tags mono"><span class="tag">Three.js</span><span class="tag">Netcode</span></div></div>
+      </article>
+      <article class="card c4" data-reveal data-tilt>
+        <a class="stretch" href="https://xdi8blox.github.io/nocturne/" target="_blank" rel="noopener" aria-label="Nocturne, live demo"></a>
+        <div class="img"><img src="/img/nocturne.webp" alt="Nocturne: cinematic movie discovery interface" loading="lazy" width="1280" height="800"></div>
+        <div class="meta"><div class="row"><h3>Nocturne</h3><span class="live mono">Live<svg><use href="#arr"/></svg></span></div>
+          <p>Cinematic movie discovery app with a streaming-service interface, search and watchlists.</p>
+          <div class="tags mono"><span class="tag">React</span><span class="tag">Framer Motion</span><span class="tag">TMDB</span></div></div>
+      </article>
+      <article class="card c5" data-reveal data-tilt>
+        <a class="stretch" href="https://xdi8blox.github.io/omnicart/" target="_blank" rel="noopener" aria-label="OMNICART, live demo"></a>
+        <div class="img"><img src="/img/omnicart.webp" alt="OMNICART: arcade collection menu" style="object-position:left top" loading="lazy" width="1280" height="720"></div>
+        <div class="meta"><div class="row"><h3>OMNICART</h3><span class="live mono">Live<svg><use href="#arr"/></svg></span></div>
+          <p>Ten-game arcade collection in one cartridge: racing, shooters, puzzles and a fighter.</p>
+          <div class="tags mono"><span class="tag">TypeScript</span><span class="tag">Canvas</span><span class="tag">Three.js</span></div></div>
+      </article>
+      <article class="card c7" data-reveal data-tilt>
+        <a class="stretch" href="https://xdi8blox.github.io/sidereal/" target="_blank" rel="noopener" aria-label="Sidereal, live demo"></a>
+        <div class="img"><img src="/img/sidereal.webp" alt="Sidereal: audio-reactive 3D galaxy" loading="lazy" width="1280" height="800"></div>
+        <div class="meta"><div class="row"><h3>Sidereal</h3><span class="live mono">Live<svg><use href="#arr"/></svg></span></div>
+          <p>Audio-reactive galaxy visualiser: GPU particles and custom GLSL driven by your music.</p>
+          <div class="tags mono"><span class="tag">GLSL</span><span class="tag">Three.js</span><span class="tag">Web Audio</span></div></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- PRIVATE -->
+<section class="block panel" id="private">
+  <div class="wrap">
+    <div class="sechead">
+      <div><div class="kicker mono" data-reveal>(02) Private builds</div><h2 class="display" data-split>The rest runs behind closed doors.</h2></div>
+      <p data-reveal>These systems aren't public. Here is what they do; I'm happy to walk through the approach on a call.</p>
+    </div>
+    <div class="plist" data-stagger>
+      <div class="pitem" data-reveal><span class="i mono">01</span><div><h4 class="display">Solana sniper bot</h4><div class="s mono">JavaScript · Python · Solana</div></div><p>Watches new pools and launches, filters out likely rugs, and buys early with configurable take-profit and stop rules.</p><span class="lock mono"><svg><use href="#lock"/></svg>Private</span></div>
+      <div class="pitem" data-reveal><span class="i mono">02</span><div><h4 class="display">Sports betting bot</h4><div class="s mono">Python · Odds APIs</div></div><p>Scans bookmaker odds for value, sizes stakes automatically and logs every bet for review.</p><span class="lock mono"><svg><use href="#lock"/></svg>Private</span></div>
+      <div class="pitem" data-reveal><span class="i mono">03</span><div><h4 class="display">Telegram bots</h4><div class="s mono">Node.js · Telegram Bot API</div></div><p>Trading alerts, wallet tracking, group tools and gated communities with crypto payments.</p><span class="lock mono"><svg><use href="#lock"/></svg>Private</span></div>
+      <div class="pitem" data-reveal><span class="i mono">04</span><div><h4 class="display">Movie streaming app</h4><div class="s mono">React · Node.js</div></div><p>A full streaming web app with accounts, search, playback and continue-watching.</p><span class="lock mono"><svg><use href="#lock"/></svg>Private</span></div>
+    </div>
   </div>
 </section>
 
@@ -109,17 +189,17 @@
 <section class="block panel" id="about">
   <div class="wrap two">
     <div>
-      <div class="kicker mono" data-reveal>01 — About</div>
-      <h2 data-split>A full-time developer, not a side project.</h2>
+      <div class="kicker mono" data-reveal>(03) About</div>
+      <h2 class="display" data-split>Full-time developer. Not a side project.</h2>
     </div>
     <div class="about-body">
-      <p class="big" data-reveal>I'm Bruno Fend, building under the handle <span class="hl">xDi8blox</span>. Since finishing my diploma in IT and software engineering at NIIT in 2021, writing software has been my full-time job.</p>
-      <p data-reveal>I build systems that do real work: bots that watch markets and execute, dashboards that stay live, and web apps people enjoy using. Most of what I build is private, so this page shows the public side, seven live projects you can open right now, and describes the rest.</p>
+      <p class="big" data-reveal>I'm Diablo. I graduated from NIIT in 2021 with honors in IT and software engineering, and writing software has been my full-time job ever since.</p>
+      <p data-reveal>I build systems that do real work: bots that watch markets and execute, dashboards that stay live, platforms like Nuviro with real users and real money moving through them, and web apps people enjoy using. A lot of it is private, so this page shows what I can show and describes the rest.</p>
       <p data-reveal>I also take on freelance web work: WordPress with Elementor, Shopify stores, landing pages and hand-written HTML, CSS and JavaScript, plus AI integrations for products that need them.</p>
       <dl class="facts mono" data-stagger>
         <div data-reveal><dt>Role</dt><dd>Full-time developer</dd></div>
         <div data-reveal><dt>Status</dt><dd>Independent, since 2021</dd></div>
-        <div data-reveal><dt>Education</dt><dd>Diploma, IT &amp; Software Engineering, NIIT (2021)</dd></div>
+        <div data-reveal><dt>Education</dt><dd>NIIT — Diploma in IT &amp; Software Engineering, with Honors (2021)</dd></div>
         <div data-reveal><dt>Timezone</dt><dd>UTC+1, remote and async-friendly</dd></div>
       </dl>
     </div>
@@ -130,101 +210,16 @@
 <section class="block panel" id="services">
   <div class="wrap">
     <div class="sechead">
-      <div><div class="kicker mono" data-reveal>02 — What I do</div><h2 data-split>Automation, web and 3D, built end to end.</h2></div>
+      <div><div class="kicker mono" data-reveal>(04) What I do</div><h2 class="display" data-split>Automation, web and 3D, built end to end.</h2></div>
       <p data-reveal>One developer from first message to deployment. No hand-offs, no agency layers.</p>
     </div>
     <div class="svc-grid" data-stagger>
-      <article class="svc" data-reveal><span class="no mono">01</span><h3>Trading &amp; crypto automation</h3><p>Bots and tooling for Solana and EVM chains: market scanners, execution, wallet tracking and alerts, with risk limits and logging built in.</p></article>
-      <article class="svc" data-reveal><span class="no mono">02</span><h3>Betting &amp; data systems</h3><p>Odds collection, value detection, staking logic and bet logging, written in Python and built to run unattended and report back.</p></article>
-      <article class="svc" data-reveal><span class="no mono">03</span><h3>Telegram bots</h3><p>Alerts, commands, group management and paid-access flows on the Telegram Bot API, deployed serverless or on a server.</p></article>
-      <article class="svc" data-reveal><span class="no mono">04</span><h3>Interactive web &amp; 3D</h3><p>Games, visualisers and product experiences in Three.js, Canvas and GLSL, tuned to stay smooth on a phone.</p></article>
-      <article class="svc" data-reveal><span class="no mono">05</span><h3>Websites &amp; storefronts</h3><p>WordPress with Elementor, Shopify, landing pages and hand-coded HTML, CSS and JavaScript. Fast, responsive, easy to hand over.</p></article>
-      <article class="svc" data-reveal><span class="no mono">06</span><h3>AI integrations</h3><p>Chat interfaces, assistants and automations wired into your product through model APIs, or running in the browser.</p></article>
-    </div>
-  </div>
-</section>
-
-<!-- interlude: terrain shows through -->
-<section class="interlude" aria-label="Selected work follows">
-  <div class="wrap">
-    <p class="mono" data-reveal>Public work</p>
-    <h2 data-split>Everything below is live. Open it.</h2>
-  </div>
-</section>
-
-<!-- WORK -->
-<section class="block panel" id="work">
-  <div class="wrap">
-    <div class="sechead">
-      <div><div class="kicker mono" data-reveal>03 — Selected work</div><h2 data-split>Things you can open and use.</h2></div>
-      <p data-reveal>Seven public projects, each deployed to GitHub Pages. Click through to the live demo, or read the source.</p>
-    </div>
-    <div class="grid" data-stagger>
-      <article class="card c7" data-reveal data-tilt>
-        <a class="stretch" href="https://xdi8blox.github.io/sendit-terminal/" target="_blank" rel="noopener" aria-label="Sendit Terminal, live demo"></a>
-        <div class="img"><img src="/img/sendit.webp" alt="Sendit Terminal: order book, candle chart and Solana meme radar" loading="lazy" width="1280" height="800"></div>
-        <div class="meta"><div class="row"><h3>Sendit Terminal</h3><span class="live mono">Live<svg><use href="#arr"/></svg></span></div>
-          <p>Live crypto market terminal: streaming Binance order book and candles, a Solana meme-coin radar, keyboard-driven paper trading.</p>
-          <div class="foot"><div class="tags mono"><span class="tag">TypeScript</span><span class="tag">WebSockets</span><span class="tag">Binance</span><span class="tag">DexScreener</span></div><a class="src mono" href="https://github.com/xDi8blox/sendit-terminal" target="_blank" rel="noopener">Source</a></div></div>
-      </article>
-      <article class="card c5" data-reveal data-tilt>
-        <a class="stretch" href="https://xdi8blox.github.io/neon-apex/" target="_blank" rel="noopener" aria-label="HELLDRIVE, live demo"></a>
-        <div class="img"><img src="/img/helldrive.webp" alt="HELLDRIVE: 3D racing at night with a supercar" loading="lazy" width="1280" height="720"></div>
-        <div class="meta"><div class="row"><h3>HELLDRIVE</h3><span class="live mono">Live<svg><use href="#arr"/></svg></span></div>
-          <p>3D arcade racer with PBR supercars, HDRI lighting, nitro, AI rivals and full touch controls.</p>
-          <div class="foot"><div class="tags mono"><span class="tag">Three.js</span><span class="tag">glTF</span><span class="tag">Mobile</span></div><a class="src mono" href="https://github.com/xDi8blox/neon-apex" target="_blank" rel="noopener">Source</a></div></div>
-      </article>
-      <article class="card c4" data-reveal data-tilt>
-        <a class="stretch" href="https://xdi8blox.github.io/bagscope/" target="_blank" rel="noopener" aria-label="Bagscope, live demo"></a>
-        <div class="img"><img src="/img/bagscope.webp" alt="Bagscope wallet dashboard with PnL chart and allocation" loading="lazy" width="1280" height="800"></div>
-        <div class="meta"><div class="row"><h3>Bagscope</h3><span class="live mono">Live<svg><use href="#arr"/></svg></span></div>
-          <p>Scope any Solana or EVM wallet: holdings, PnL, swaps and NFTs. No API key needed.</p>
-          <div class="foot"><div class="tags mono"><span class="tag">React</span><span class="tag">Solana</span><span class="tag">EVM</span></div><a class="src mono" href="https://github.com/xDi8blox/bagscope" target="_blank" rel="noopener">Source</a></div></div>
-      </article>
-      <article class="card c4" data-reveal data-tilt>
-        <a class="stretch" href="https://xdi8blox.github.io/bloodrite/" target="_blank" rel="noopener" aria-label="BLOODRITE, live demo"></a>
-        <div class="img"><img src="/img/bloodrite.webp" alt="BLOODRITE: two rigged fighters in a gothic arena" loading="lazy" width="1280" height="720"></div>
-        <div class="meta"><div class="row"><h3>BLOODRITE</h3><span class="live mono">Live<svg><use href="#arr"/></svg></span></div>
-          <p>Gothic 2.5D fighting game with rigged characters, finishers and rollback-netcode online 1v1.</p>
-          <div class="foot"><div class="tags mono"><span class="tag">Three.js</span><span class="tag">Netcode</span></div><a class="src mono" href="https://github.com/xDi8blox/bloodrite" target="_blank" rel="noopener">Source</a></div></div>
-      </article>
-      <article class="card c4" data-reveal data-tilt>
-        <a class="stretch" href="https://xdi8blox.github.io/nocturne/" target="_blank" rel="noopener" aria-label="Nocturne, live demo"></a>
-        <div class="img"><img src="/img/nocturne.webp" alt="Nocturne: cinematic movie discovery interface" loading="lazy" width="1280" height="800"></div>
-        <div class="meta"><div class="row"><h3>Nocturne</h3><span class="live mono">Live<svg><use href="#arr"/></svg></span></div>
-          <p>Cinematic movie discovery app with a streaming-service interface, search and watchlists.</p>
-          <div class="foot"><div class="tags mono"><span class="tag">React</span><span class="tag">Framer Motion</span><span class="tag">TMDB</span></div><a class="src mono" href="https://github.com/xDi8blox/nocturne" target="_blank" rel="noopener">Source</a></div></div>
-      </article>
-      <article class="card c5" data-reveal data-tilt>
-        <a class="stretch" href="https://xdi8blox.github.io/omnicart/" target="_blank" rel="noopener" aria-label="OMNICART, live demo"></a>
-        <div class="img"><img src="/img/omnicart.webp" alt="OMNICART: arcade collection menu" style="object-position:left top" loading="lazy" width="1280" height="720"></div>
-        <div class="meta"><div class="row"><h3>OMNICART</h3><span class="live mono">Live<svg><use href="#arr"/></svg></span></div>
-          <p>Ten-game arcade collection in one cartridge: racing, shooters, puzzles and a fighter.</p>
-          <div class="foot"><div class="tags mono"><span class="tag">TypeScript</span><span class="tag">Canvas</span><span class="tag">Three.js</span></div><a class="src mono" href="https://github.com/xDi8blox/omnicart" target="_blank" rel="noopener">Source</a></div></div>
-      </article>
-      <article class="card c7" data-reveal data-tilt>
-        <a class="stretch" href="https://xdi8blox.github.io/sidereal/" target="_blank" rel="noopener" aria-label="Sidereal, live demo"></a>
-        <div class="img"><img src="/img/sidereal.webp" alt="Sidereal: audio-reactive 3D galaxy" loading="lazy" width="1280" height="800"></div>
-        <div class="meta"><div class="row"><h3>Sidereal</h3><span class="live mono">Live<svg><use href="#arr"/></svg></span></div>
-          <p>Audio-reactive galaxy visualiser: GPU particles and custom GLSL driven by your music.</p>
-          <div class="foot"><div class="tags mono"><span class="tag">GLSL</span><span class="tag">Three.js</span><span class="tag">Web Audio</span></div><a class="src mono" href="https://github.com/xDi8blox/sidereal" target="_blank" rel="noopener">Source</a></div></div>
-      </article>
-    </div>
-  </div>
-</section>
-
-<!-- PRIVATE -->
-<section class="block panel" id="private">
-  <div class="wrap">
-    <div class="sechead">
-      <div><div class="kicker mono" data-reveal>04 — Private work</div><h2 data-split>Most of what I build runs behind closed doors.</h2></div>
-      <p data-reveal>These systems stay private. Here is what they do; I'm happy to walk through the approach on a call.</p>
-    </div>
-    <div class="plist" data-stagger>
-      <div class="pitem" data-reveal><span class="i mono">01</span><div><h4>Solana sniper bot</h4><div class="s mono">JavaScript · Python · Solana</div></div><p>Watches new pools and launches, filters out likely rugs, and buys early with configurable take-profit and stop rules.</p><span class="lock mono"><svg><use href="#lock"/></svg>Private</span></div>
-      <div class="pitem" data-reveal><span class="i mono">02</span><div><h4>Sports betting bot</h4><div class="s mono">Python · Odds APIs</div></div><p>Scans bookmaker odds for value, sizes stakes automatically and logs every bet for review.</p><span class="lock mono"><svg><use href="#lock"/></svg>Private</span></div>
-      <div class="pitem" data-reveal><span class="i mono">03</span><div><h4>Telegram bots</h4><div class="s mono">Node.js · Telegram Bot API</div></div><p>Trading alerts, wallet tracking, group tools and gated communities with crypto payments.</p><span class="lock mono"><svg><use href="#lock"/></svg>Private</span></div>
-      <div class="pitem" data-reveal><span class="i mono">04</span><div><h4>Movie streaming app</h4><div class="s mono">React · Node.js</div></div><p>A full streaming web app with accounts, search, playback and continue-watching.</p><span class="lock mono"><svg><use href="#lock"/></svg>Private</span></div>
+      <article class="svc" data-reveal><span class="no mono">01</span><h3 class="display">Trading &amp; crypto automation</h3><p>Bots and tooling for Solana and EVM chains: market scanners, execution, wallet tracking and alerts, with risk limits and logging built in.</p></article>
+      <article class="svc" data-reveal><span class="no mono">02</span><h3 class="display">Betting &amp; data systems</h3><p>Odds collection, value detection, staking logic and bet logging, written in Python and built to run unattended and report back.</p></article>
+      <article class="svc" data-reveal><span class="no mono">03</span><h3 class="display">Telegram bots</h3><p>Alerts, commands, group management and paid-access flows on the Telegram Bot API, deployed serverless or on a server.</p></article>
+      <article class="svc" data-reveal><span class="no mono">04</span><h3 class="display">Interactive web &amp; 3D</h3><p>Games, visualisers and product experiences in Three.js, Canvas and GLSL, tuned to stay smooth on a phone.</p></article>
+      <article class="svc" data-reveal><span class="no mono">05</span><h3 class="display">Websites &amp; storefronts</h3><p>WordPress with Elementor, Shopify, landing pages and hand-coded HTML, CSS and JavaScript. Fast, responsive, easy to hand over.</p></article>
+      <article class="svc" data-reveal><span class="no mono">06</span><h3 class="display">AI integrations</h3><p>Chat interfaces, assistants and automations wired into your product through model APIs, or running in the browser.</p></article>
     </div>
   </div>
 </section>
@@ -233,40 +228,40 @@
 <section class="block panel" id="process">
   <div class="wrap">
     <div class="sechead">
-      <div><div class="kicker mono" data-reveal>05 — How I work</div><h2 data-split>Plain scope, small steps, nothing hidden.</h2></div>
+      <div><div class="kicker mono" data-reveal>(05) How I work</div><h2 class="display" data-split>Plain scope, small steps, nothing hidden.</h2></div>
       <p data-reveal>The same four steps whether it's a landing page or a trading system.</p>
     </div>
     <ol class="steps" id="steps" data-stagger>
-      <li data-reveal><span class="no mono">01</span><h3>Scope</h3><p>A short call or message to pin down what it should do, what it touches and what "done" means. You get a plain-language plan and a clear first milestone.</p></li>
-      <li data-reveal><span class="no mono">02</span><h3>Build</h3><p>Small working increments you can see early. Config instead of hard-coding, logs from day one, no black boxes.</p></li>
-      <li data-reveal><span class="no mono">03</span><h3>Harden</h3><p>Dry runs, paper trading or staging before anything touches real money or real users. Edge cases get tested, not hoped about.</p></li>
-      <li data-reveal><span class="no mono">04</span><h3>Ship &amp; support</h3><p>Deployed, documented and handed over, with fixes and changes afterwards when you need them.</p></li>
+      <li data-reveal><span class="no mono">01</span><h3 class="display">Scope</h3><p>A short call or message to pin down what it should do, what it touches and what "done" means. You get a plain-language plan and a clear first milestone.</p></li>
+      <li data-reveal><span class="no mono">02</span><h3 class="display">Build</h3><p>Small working increments you can see early. Config instead of hard-coding, logs from day one, no black boxes.</p></li>
+      <li data-reveal><span class="no mono">03</span><h3 class="display">Harden</h3><p>Dry runs, paper trading or staging before anything touches real money or real users. Edge cases get tested, not hoped about.</p></li>
+      <li data-reveal><span class="no mono">04</span><h3 class="display">Ship &amp; support</h3><p>Deployed, documented and handed over, with fixes and changes afterwards when you need them.</p></li>
     </ol>
   </div>
 </section>
 
-<!-- STACK + EXPERIENCE -->
+<!-- STACK + TIMELINE -->
 <section class="block panel" id="stack">
   <div class="wrap two">
     <div>
-      <div class="kicker mono" data-reveal>06 — Tech stack</div>
-      <h2 data-split>Tools I reach for.</h2>
+      <div class="kicker mono" data-reveal>(06) Stack</div>
+      <h2 class="display" data-split>Tools I reach for.</h2>
       <div class="stack-groups" data-stagger>
         <div data-reveal><h4 class="mono">Languages</h4><p>TypeScript · JavaScript · Python · HTML &amp; CSS · Shell</p></div>
         <div data-reveal><h4 class="mono">Front end &amp; 3D</h4><p>React · Vite · Three.js · GLSL · Framer Motion · Canvas · Web Audio</p></div>
         <div data-reveal><h4 class="mono">Back end &amp; bots</h4><p>Node.js · Express · Telegram Bot API · WebSockets · REST · Docker</p></div>
         <div data-reveal><h4 class="mono">Crypto</h4><p>Solana · EVM chains · Jupiter · DexScreener · Helius · Binance market data</p></div>
-        <div data-reveal><h4 class="mono">Sites &amp; hosting</h4><p>WordPress · Elementor · Shopify · Vercel · GitHub Pages &amp; Actions</p></div>
+        <div data-reveal><h4 class="mono">Sites &amp; hosting</h4><p>WordPress · Elementor · Shopify · Vercel · Cloudflare · GitHub Actions</p></div>
         <div data-reveal><h4 class="mono">AI</h4><p>LLM APIs · in-browser models · prompt and tool design</p></div>
       </div>
     </div>
     <div>
-      <div class="kicker mono" data-reveal>07 — Experience</div>
-      <h2 data-split>Timeline.</h2>
+      <div class="kicker mono" data-reveal>(07) Experience</div>
+      <h2 class="display" data-split>Timeline.</h2>
       <ol class="timeline" id="timeline" data-stagger>
-        <li data-reveal><span class="when mono">2026</span><div><h3>Public portfolio</h3><p>Shipped seven public browser projects with live demos: a market terminal, a wallet viewer, three 3D games, an arcade collection and a visualiser.</p></div></li>
-        <li data-reveal><span class="when mono">2021 – Present</span><div><h3>Independent developer</h3><p>Full-time development of trading and betting automation, Telegram bots, crypto tooling, a streaming web app and websites.</p></div></li>
-        <li data-reveal><span class="when mono">2021</span><div><h3>NIIT</h3><p>Diploma in IT and software engineering, completed.</p></div></li>
+        <li data-reveal><span class="when mono">Now</span><div><h3 class="display">Live products</h3><p>Nuviro, a market terminal, a wallet viewer, a movie app, two 3D games, an arcade collection and an audio visualiser, all running in the browser.</p></div></li>
+        <li data-reveal><span class="when mono">2021 – Present</span><div><h3 class="display">Independent developer</h3><p>Full-time development of trading and betting automation, Telegram bots, crypto tooling, a streaming web app and websites.</p></div></li>
+        <li data-reveal><span class="when mono">2021</span><div><h3 class="display">NIIT</h3><p>Diploma in IT and software engineering, with honors.</p></div></li>
       </ol>
     </div>
   </div>
@@ -275,24 +270,26 @@
 <!-- CONTACT -->
 <section class="ctasec" id="contact">
   <div class="wrap">
-    <div>
-      <div class="kicker mono" data-reveal>08 — Contact</div>
-      <h2 data-split>Have a bot or app in mind? Let's talk about it.</h2>
-      <p class="avail" data-reveal><span class="dot"></span>Currently taking new projects. The quickest way to reach me is GitHub.</p>
+    <div class="kicker mono" data-reveal>(08) Contact</div>
+    <h2 class="display" data-split>Have something that should run on its own?</h2>
+    <div class="mailrow" data-reveal>
+      <a class="mail-big display" href="mailto:Humanoid118@gmail.com" id="mailBig">Humanoid118<wbr>@gmail.com</a>
+      <div class="mail-actions">
+        <a class="btn pri lg" href="mailto:Humanoid118@gmail.com" data-magnetic>Send an email<svg><use href="#right"/></svg></a>
+        <button class="btn sec lg" id="copyBtn" type="button" aria-live="polite"><svg><use href="#copy"/></svg><span>Copy address</span></button>
+      </div>
     </div>
-    <div class="ctas">
-      <!-- TODO(owner): add email (mailto:) and Telegram (https://t.me/…) buttons here once the real handles are provided. -->
-      <a class="btn pri lg" href="https://github.com/xDi8blox" target="_blank" rel="noopener" data-magnetic><svg><use href="#gh"/></svg>Message me on GitHub<svg><use href="#right"/></svg></a>
-    </div>
+    <!-- TODO(owner): add a Telegram button here (https://t.me/…) once the handle is provided. -->
+    <p class="avail mono" data-reveal><span class="dot"></span>Currently taking new projects</p>
   </div>
 </section>
 </main>
 
 <footer>
-  <div class="wrap mono"><span>© 2026 Bruno Fend · xDi8blox</span><span><a class="ul" href="https://github.com/xDi8blox" target="_blank" rel="noopener">GitHub</a> · <a class="ul" href="#hero">Back to top</a></span></div>
+  <div class="wrap mono"><span>© 2026 Diablo</span><span class="foot-r"><a class="ul" href="mailto:Humanoid118@gmail.com">Email</a><a class="gh-ico" href="https://github.com/xDi8blox" target="_blank" rel="noopener" aria-label="GitHub"><svg><use href="#gh"/></svg></a><a class="ul" href="#hero">Top</a></span></div>
 </footer>
 
 <script type="module" src="/src/main.js"></script>
-<noscript><style>.loader{display:none!important}[data-reveal],.line .w,[data-hero]{opacity:1!important;transform:none!important}</style></noscript>
+<noscript><style>.loader{display:none!important}[data-reveal],.ch,[data-hero],.tl{opacity:1!important;transform:none!important}</style></noscript>
 </body>
 </html>

@@ -1,5 +1,7 @@
 import '@fontsource-variable/geist';
 import '@fontsource-variable/geist-mono';
+import '@fontsource-variable/bodoni-moda';
+import '@fontsource-variable/bodoni-moda/wght-italic.css';
 import './style.css';
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -16,8 +18,9 @@ $$('[data-split]').forEach((el) => {
   el.innerHTML = words.map((w, i) => `<span class="sw" aria-hidden="true"><span style="--i:${i}">${w}</span></span>`).join(' ');
 });
 // hero word stagger index
-$$('#h1 .w').forEach((w, i) => w.style.setProperty('--i', i));
-$$('[data-hero]').forEach((el) => el.style.setProperty('--d', 380 + Number(el.dataset.hero) * 110));
+$$('#mega .ch').forEach((c, i) => c.style.setProperty('--i', i));
+$$('.tagline .tl').forEach((t, i) => t.style.setProperty('--d', 520 + i * 160));
+$$('[data-hero]').forEach((el) => el.style.setProperty('--d', 380 + Number(el.dataset.hero) * 130));
 // per-group stagger for reveals
 $$('[data-stagger]').forEach((g) => $$(':scope > [data-reveal]', g).forEach((el, i) => el.style.setProperty('--i', i % 3)));
 
@@ -29,23 +32,19 @@ $$('[data-reveal],[data-split]').forEach((el) => io.observe(el));
 
 /* ---------- counters ---------- */
 function countUp(el) {
-  const to = Number(el.dataset.count), suffix = el.dataset.suffix || '';
+  const to = Number(el.dataset.count), from = Number(el.dataset.from || 0), suffix = el.dataset.suffix || '';
   if (reduced) { el.textContent = to + suffix; return; }
   const t0 = performance.now(), dur = 1600;
   const tick = (now) => {
     const t = clamp((now - t0) / dur), e = t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
-    el.textContent = Math.round(to * e) + (t === 1 ? suffix : '');
+    el.textContent = Math.round(from + (to - from) * e) + (t === 1 ? suffix : '');
     if (t < 1) requestAnimationFrame(tick);
   };
-  el.textContent = '0';
+  el.textContent = from;
   requestAnimationFrame(tick);
 }
 const cio = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { countUp(e.target); cio.unobserve(e.target); } }), { threshold: 0.6 });
 $$('[data-count]').forEach((el) => cio.observe(el));
-// public repo count is verifiable from the GitHub API; keep the static value if the request fails
-fetch('https://api.github.com/users/xDi8blox').then((r) => (r.ok ? r.json() : null)).then((j) => {
-  if (j && Number.isFinite(j.public_repos)) $('#repoCount').dataset.count = j.public_repos;
-}).catch(() => {});
 
 /* ---------- nav: state, active link, progress, hide on scroll down ---------- */
 const nav = $('#nav'), bar = $('#progress');
@@ -73,6 +72,7 @@ function onScroll() {
     const el = $('#' + id), r = el.getBoundingClientRect();
     el.style.setProperty('--prog', clamp((innerHeight * 0.75 - r.top) / (r.height + innerHeight * 0.1)).toFixed(3));
   }
+  $('#mega').style.setProperty('--my', (y * 0.14).toFixed(1) + 'px');
   ticking = false;
 }
 addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
@@ -110,24 +110,7 @@ if (finePointer && !reduced) {
   });
 }
 
-/* ---------- WebGL terrain ---------- */
-const hudT = $('#hudT'), hudE = $('#hudE'), hudS = $('#hudS');
-const sectorOf = () => {
-  const probe = scrollY + innerHeight * 0.5;
-  let n = 'Hero';
-  for (const [id, label] of [['about', 'About'], ['services', 'Services'], ['work', 'Work'], ['private', 'Private'], ['process', 'Process'], ['stack', 'Stack'], ['contact', 'Contact']]) {
-    const el = $('#' + id); if (el && el.offsetTop <= probe) n = label;
-  }
-  return n;
-};
-let hudTick = 0;
-function hud(travel, cur) {
-  if (++hudTick % 4) return;
-  hudT.textContent = (travel * 12.5).toFixed(1).padStart(6, '0');
-  hudE.textContent = (cur.amp * 21.4).toFixed(2);
-  const s = sectorOf(); if (hudS.textContent !== s) hudS.textContent = s;
-}
-
+/* ---------- WebGL scene ---------- */
 function webglAvailable() {
   try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch { return false; }
 }
@@ -139,7 +122,7 @@ async function boot() {
     root.classList.add('no-gl');
   } else {
     sceneReady = import('./scene.js').then((m) => {
-      const api = m.initScene(canvas, { reduced, hud: reduced ? undefined : hud });
+      const api = m.initScene(canvas, { reduced });
       if (!api) root.classList.add('no-gl');
       window.__scene = api;
     }).catch((err) => { console.warn('WebGL scene unavailable', err); root.classList.add('no-gl'); });
@@ -152,6 +135,7 @@ async function boot() {
 const loader = $('#loader'), loadn = $('#loadn'), loadbar = $('#loadbar');
 function start() {
   root.classList.add('started');
+  window.__scene && window.__scene.startIntro();
   loader.classList.add('done');
   setTimeout(() => loader.remove(), 1200);
   onScroll();
@@ -179,3 +163,33 @@ function start() {
   done = true; p = 1; paint();
   setTimeout(start, 250);
 })();
+
+/* ---------- copy email ---------- */
+const copyBtn = $('#copyBtn');
+copyBtn.addEventListener('click', async () => {
+  const addr = 'Humanoid118@gmail.com';
+  try { await navigator.clipboard.writeText(addr); }
+  catch { const t = document.createElement('textarea'); t.value = addr; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); } catch {} t.remove(); }
+  const label = $('span', copyBtn);
+  copyBtn.classList.add('copied'); label.textContent = 'Copied';
+  setTimeout(() => { copyBtn.classList.remove('copied'); label.textContent = 'Copy address'; }, 2000);
+});
+
+/* ---------- fit the wordmark to the viewport ---------- */
+const mega = $('#mega');
+function fitMega() {
+  const tall = innerWidth <= 760;
+  const rows = $$('.row', mega);
+  mega.style.fontSize = '100px';
+  const w = Math.max(...rows.map((r) => r.getBoundingClientRect().width)) * (tall ? 1 : 1);
+  const total = tall ? w : rows.reduce((a, r) => a + r.getBoundingClientRect().width, 0);
+  const target = innerWidth * (tall ? 0.94 : 0.985);
+  mega.style.fontSize = (100 * target / total).toFixed(2) + 'px';
+  const fs = parseFloat(mega.style.fontSize);
+  // the hero reserves exactly the wordmark's height
+  const h = tall ? fs * 0.76 * 2 : fs * 0.74;
+  document.documentElement.style.setProperty('--mega-h', h.toFixed(0) + 'px');
+}
+if (document.fonts) document.fonts.ready.then(fitMega);
+fitMega();
+addEventListener('resize', fitMega);
